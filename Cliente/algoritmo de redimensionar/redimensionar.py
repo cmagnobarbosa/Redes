@@ -9,6 +9,7 @@ Carlos Magno
 imagem = sys.argv[1]
 largura= sys.argv[2]
 altura = sys.argv[3]
+print largura,altura
 size = [int(largura),int(altura)]
 print "imagem",imagem,"Tamanho:",largura,altura
 
