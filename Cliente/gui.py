@@ -36,6 +36,7 @@ class Gui:
         janela = pygame.display.get_surface()
         print janela
         pygame.draw.rect(janela,(0,0,255),(350,230,200,200))
+        self.escrever("Entrouu",(400, 80))
 
     def distribui_cartas(self):
         """Função de teste.. as cartas devem ser recebidas do servidor"""
@@ -84,6 +85,12 @@ class Gui:
 
     def novo_tamanho_janela(self):
         self.tela = pygame.display.set_mode((800, 500),0,32)
+
+    def escrever(self,texto,posicao):
+        """Formato posicao (horizontal,vertical)"""
+        myfont = pygame.font.SysFont("arial", 18)
+        label = myfont.render(texto, 1, (255, 255, 255))
+        self.tela.blit(label,posicao)
 
     def main(self):
         self.carrega_cartas()
@@ -144,14 +151,11 @@ class Gui:
                     self.novo_tamanho_janela()
                     self.desenha_bloco()
                     self.tela.blit(fundo, [0, 0])
-                    myfont = pygame.font.SysFont("arial", 18)
-                    # render text
-                    texto = "Para selecionar cartas escolha [1,2,3]"
-                    label = myfont.render(texto, 1, (255, 255, 255))
-                    self.tela.blit(label, (400, 30))
-                    texto = "Para Jogar a carta utilize seta para frente"
-                    label = myfont.render(texto, 1, (255, 255, 255))
-                    self.tela.blit(label, (400, 45))
+
+                    self.escrever("Para selecionar cartas escolha [1,2,3]",(400, 30))
+                    self.escrever("Para Jogar a carta utilize seta para frente",(400, 50))
+                    self.escrever("Utilize as setas direcionais para ocultar",(400, 70))
+
                     select = 1
 
             # update_card(tela,None)
