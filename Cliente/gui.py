@@ -25,24 +25,38 @@ class Gui:
         """A lista da mão deve ser recebida do servidor"""
         self.lista_cards = []
         self.cards_selected = []
-        self.mao=[]
+        self.mao = []
         self.tela = pygame.display.set_mode((500, 400), 0, 32)
         self.icone = pygame.image.load("expresso.png")
         pygame.display.set_icon(self.icone)
 
-    def desenha_bloco(self):
+    def desenha_botao_truco(self):
+        """Desenha o Botão de truco"""
+        valor="Truco"
+        pygame.draw.rect(self.tela,(192,192,192),(700,471, 50,20))
+        self.escrever(valor,(700,471))
+        #card = pygame.draw.rect(janela, (0, 0, 0), (723, 432, 350, 30))
+
+    def mostra_pontuacao(self):
+        """ Renderiza a Pontuação."""
+        ponto = 0
+        ponto_ad = 0
+        self.escrever("Nós: "+str(ponto)+" Eles: "+str(ponto_ad),(40,450))
+
+    def rodadas(self):
         """"Desenha um bloco"""
-        print "entrouu"
-        janela = pygame.display.get_surface()
-        print janela
-        pygame.draw.rect(janela,(0,0,255),(350,230,200,200))
-        self.escrever("Entrouu",(400, 80))
+        p_1=" Ganhou "
+        p_2=" Perdeu "
+        p_3=" Empatou "
+        card = pygame.draw.rect(self.tela, (0, 0, 0), (29, 471, 350, 30))
+        self.escrever("[1º"+str(p_1)+"] | [2º"+str(p_2)+"] | [3º"+str(p_3)+"]",(40,471))
+        pygame.display.update()
 
     def distribui_cartas(self):
         """Função de teste.. as cartas devem ser recebidas do servidor"""
-        self.cards_selected[:]=[]
-        for k in range(0,3):
-            valor = random.randint(0,len(self.lista_cards)-1)
+        self.cards_selected[:] = []
+        for k in range(0, 3):
+            valor = random.randint(0, len(self.lista_cards) - 1)
             if valor in self.cards_selected:
                 self.distribui_cartas()
             self.cards_selected.append(valor)
@@ -54,24 +68,24 @@ class Gui:
             if (".png") in naipe_cards:
                 self.lista_cards.append(naipe_cards)
 
-    def update_card(self,card):
+    def update_card(self, card):
         """Atualiza o desenho das cartas"""
         """(posicao_horizontal,posicao_vertical,d_altura,d_largura)"""
-        card= pygame.image.load(card)
+        card = pygame.image.load(card)
         card_rect = card.get_rect()
         self.tela.blit(card, (400, 250, 172, 250))
 
-    def jogar_carta(self,carta):
+    def jogar_carta(self, carta):
         """Desenha a cart que foi jogada"""
         card_king = pygame.image.load(carta)
         king_rect = card_king.get_rect()
         self.tela.blit(card_king, (10, 10, 172, 250))
 
-    def iniciar(self,cor):
+    def iniciar(self, cor):
         """Tela inicial"""
         myfont = pygame.font.SysFont("arial", 30)
         label = myfont.render(
-        "Clique Para Iniciar o jogo!", 1, (255, 255, 255))
+            "Clique Para Iniciar o jogo!", 1, (255, 255, 255))
         truco = pygame.image.load("background/background.png")
         self.tela.blit(truco, (0, 0))
         self.tela.blit(label, (120, 370))
@@ -79,24 +93,27 @@ class Gui:
     def gera_mao(self):
         """Gera a mão a partir das listas de cartas selecionadas"""
         for i in self.cards_selected:
-            print "Valor de I",i,"Tamanho ",len(self.lista_cards)
-            self.mao.append("cartas/"+self.lista_cards[i])
+            print "Valor de I", i, "Tamanho ", len(self.lista_cards)
+            self.mao.append("cartas/" + self.lista_cards[i])
         self.mao.append("cartas/verso2.jpg")
 
     def novo_tamanho_janela(self):
-        self.tela = pygame.display.set_mode((800, 500),0,32)
+        self.tela = pygame.display.set_mode((800, 500), 0, 32)
 
-    def escrever(self,texto,posicao):
+    def escrever(self, texto, posicao):
         """Formato posicao (horizontal,vertical)"""
+        texto_c = unicode(texto,"utf-8")
         myfont = pygame.font.SysFont("arial", 18)
-        label = myfont.render(texto, 1, (255, 255, 255))
-        self.tela.blit(label,posicao)
+        label = myfont.render(texto_c, 1, (255, 255, 255))
+        self.tela.blit(label, posicao)
+
+    def monitora_clique(horizontal,ver):
+        pass
 
     def main(self):
         self.carrega_cartas()
         self.distribui_cartas()
         self.gera_mao()
-
 
         pygame.init()
 
@@ -133,30 +150,39 @@ class Gui:
                     if op == "3":
                         self.update_card(self.mao[2])
                         carta_selecionada = 2
-                    if op == "275" or op =="276":
+                    if op == "275" or op == "276":
                         """Teclas de Seta esq e dir
                             carta oculta
                         """
+                        print "Entrouu", self.mao[3]
                         self.update_card(self.mao[3])
-                        carta_selecionada= 3
+                        carta_selecionada = 3
                     if op == "273":
                         print "carta jogada", self.mao[carta_selecionada]
                         if (carta_selecionada != -1):
                             self.jogar_carta(self.mao[carta_selecionada])
 
-                if event.type == MOUSEBUTTONDOWN and select == 0:
+                if event.type == MOUSEBUTTONDOWN and select ==0:
                     """Define a mudança da tela"""
                     print event.button, event.pos
                     fundo = pygame.image.load("background/fundo2.jpg")
                     self.novo_tamanho_janela()
-                    self.desenha_bloco()
                     self.tela.blit(fundo, [0, 0])
-
-                    self.escrever("Para selecionar cartas escolha [1,2,3]",(400, 30))
-                    self.escrever("Para Jogar a carta utilize seta para frente",(400, 50))
-                    self.escrever("Utilize as setas direcionais para ocultar",(400, 70))
-
+                    self.rodadas()
+                    self.mostra_pontuacao()
+                    self.desenha_botao_truco()
+                    self.escrever(
+                        "Para selecionar cartas escolha [1,2,3]", (400, 30))
+                    self.escrever(
+                        "Para Jogar a carta utilize seta para frente", (400, 50))
+                    self.escrever(
+                        "Utilize as setas direcionais para ocultar", (400, 70))
                     select = 1
+                if event.type == MOUSEBUTTONDOWN:
+                    pos = event.pos
+                    if (pos[0]>700 and pos[0]<750):
+                        if(pos[1]>471 and pos[1]<471+20):
+                            print "Truco"
 
             # update_card(tela,None)
             pygame.display.update()
