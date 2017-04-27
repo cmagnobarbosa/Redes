@@ -5,7 +5,7 @@ import os
 """
 Script Simples para redefinir o tamanho de imagens.
 """
-path = "imagens/"
+path = "../cartas/"
 cont = 0
 for filename in os.listdir(path):
     if (".png") in filename:
@@ -15,6 +15,6 @@ for filename in os.listdir(path):
         #save_name= filename.split(".")[0]+"_new"+".png"
         with open(filename, 'r+b') as f:
             with Image.open(f) as image:
-                cover = resizeimage.resize_cover(image, [172, 250])
+                cover = resizeimage.resize_cover(image, [66, 90])
                 cover.save(filename, image.format)
 print "Todas as imagens foram convertidas"

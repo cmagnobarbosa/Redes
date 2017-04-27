@@ -45,11 +45,11 @@ class Gui:
 
     def rodadas(self):
         """"Desenha um bloco"""
-        p_1=" Ganhou "
-        p_2=" Perdeu "
-        p_3=" Empatou "
+        p_1=" V "
+        p_2=" X "
+        p_3=" - "
         card = pygame.draw.rect(self.tela, (0, 0, 0), (29, 471, 350, 30))
-        self.escrever("[1º"+str(p_1)+"] | [2º"+str(p_2)+"] | [3º"+str(p_3)+"]",(40,471))
+        self.escrever("["+str(p_1)+"] | ["+str(p_2)+"] | ["+str(p_3)+"]",(40,471))
         pygame.display.update()
 
     def distribui_cartas(self):
@@ -183,6 +183,7 @@ class Gui:
                     if (pos[0]>700 and pos[0]<750):
                         if(pos[1]>471 and pos[1]<471+20):
                             print "Truco"
+
 
             # update_card(tela,None)
             pygame.display.update()
