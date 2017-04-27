@@ -73,13 +73,13 @@ class Gui:
         """(posicao_horizontal,posicao_vertical,d_altura,d_largura)"""
         card = pygame.image.load(card)
         card_rect = card.get_rect()
-        self.tela.blit(card, (400, 250, 172, 250))
+        self.tela.blit(card, (400, 400, 66, 90))
 
     def jogar_carta(self, carta):
         """Desenha a cart que foi jogada"""
         card_king = pygame.image.load(carta)
         king_rect = card_king.get_rect()
-        self.tela.blit(card_king, (10, 10, 172, 250))
+        self.tela.blit(card_king, (400, 200, 66, 90))
 
     def iniciar(self, cor):
         """Tela inicial"""
@@ -180,6 +180,7 @@ class Gui:
                     select = 1
                 if event.type == MOUSEBUTTONDOWN:
                     pos = event.pos
+                    print "Posicao ",pos
                     if (pos[0]>700 and pos[0]<750):
                         if(pos[1]>471 and pos[1]<471+20):
                             print "Truco"
