@@ -14,14 +14,12 @@
 #include <netinet/in.h>
 
 void dostuff(int); /* function prototype */
-void error(const char *msg)
-{
+void error(const char *msg){
     perror(msg);
     exit(1);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
      int sockfd, newsockfd, portno, pid;
      socklen_t clilen;
      struct sockaddr_in serv_addr, cli_addr;
@@ -67,8 +65,7 @@ int main(int argc, char *argv[])
  for each connection.  It handles all communication
  once a connnection has been established.
  *****************************************/
-void dostuff (int sock)
-{
+void dostuff (int sock){
    int n;
    char buffer[256];
 

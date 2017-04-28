@@ -2,7 +2,7 @@
 import socket
 import os
 HOST = '127.0.0.1'     # Endereco IP do Servidor
-PORT = 5000            # Porta que o Servidor esta
+PORT = 5001            # Porta que o Servidor esta
 """
 socket.AF_INET
 These constants represent the address (and protocol) families,
@@ -17,15 +17,18 @@ used for the second argument to socket().
 try:
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     dest = (HOST, PORT)
-    tcp.connect(dest)
+    servidor = tcp.connect(dest)
 except Exception as e:
     print " Erro de conexão.. verifique se o servidor está ativo."
     exit()
 
 
 print 'Para sair use CTRL+X\n'
-msg = raw_input("Digite uma mensagem:\n")
-while msg <> '\x18':
-    tcp.send(msg)
-    msg = raw_input()
+while(1):
+    mensagem = raw_input("Digite uma mensagem:\n")
+    tcp.send(mensagem)
+    retorno = tcp.recv(1024)
+    if not retorno:
+        break
+    print retorno
 tcp.close()
