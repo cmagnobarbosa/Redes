@@ -2,7 +2,7 @@
 import socket
 import os
 HOST = '127.0.0.1'     # Endereco IP do Servidor
-PORT = 5001            # Porta que o Servidor esta
+PORT = 5000            # Porta que o Servidor esta
 """
 socket.AF_INET
 These constants represent the address (and protocol) families,

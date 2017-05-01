@@ -4,6 +4,8 @@ import sys
 from pygame.locals import *
 import os
 import random
+from conexao import *
+# Modulo de conexão
 """
 Cliente
 Tp de Redes - Truco
@@ -243,4 +245,6 @@ class Gui:
             pygame.display.update()
 if __name__ == '__main__':
     newgui = Gui()
+    newconect = Conexao()
+    newconect.conectar()
     newgui.main()
