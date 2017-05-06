@@ -1,7 +1,7 @@
 # coding= utf-8
 import socket
 import os
-HOST = '127.0.0.1'     # Endereco IP do Servidor
+HOST = '172.16.255.15'     # Endereco IP do Servidor
 PORT = 5000            # Porta que o Servidor esta
 """
 socket.AF_INET
@@ -28,7 +28,5 @@ while(1):
     mensagem = raw_input("Digite uma mensagem:\n")
     tcp.send(mensagem)
     retorno = tcp.recv(1024)
-    if not retorno:
-        break
     print retorno
 tcp.close()

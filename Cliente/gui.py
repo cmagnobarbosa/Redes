@@ -120,7 +120,7 @@ class Gui:
         # (Largura)
         self.tela.blit(card_king, self.sua_pos_carta)
 
-    def iniciar(self, cor):
+    def iniciar(self):
         """Tela inicial"""
         myfont = pygame.font.SysFont("arial", 30)
         label = myfont.render(
@@ -134,7 +134,7 @@ class Gui:
         for i in self.cards_selected:
             print "Valor de I", i, "Tamanho ", len(self.lista_cards)
             self.mao.append(self.caminho_cartas + self.lista_cards[i])
-        self.mao.append(self.caminho_cartas + "/verso/verso.png")
+        self.mao.append(self.caminho_cartas + "/verso/V.png")
 
     def novo_tamanho_janela(self):
         "Largura x Altura"
@@ -157,12 +157,8 @@ class Gui:
 
         pygame.display.set_caption("Truco")
         pygame.DOUBLEBUF
-        WHITE = (255, 255, 255)
-        blue = (0, 0, 255)
-        gray = (128, 128, 128)
-        self.tela.fill(WHITE)
 
-        self.iniciar(blue)
+        self.iniciar()
 
         carta_selecionada = -1
         select = 0
@@ -245,6 +241,6 @@ class Gui:
             pygame.display.update()
 if __name__ == '__main__':
     newgui = Gui()
-    newconect = Conexao()
-    newconect.conectar()
+    #newconect = Conexao()
+    #newconect.conectar()
     newgui.main()
