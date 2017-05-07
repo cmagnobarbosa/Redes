@@ -20,11 +20,15 @@ Requisitos:
 """
 
 
-class Gui:
+class Gui():
     """Classe Gui"""
 
     def __init__(self):
         """A lista da mão deve ser recebida do servidor"""
+        self.conexao = Conexao()
+        self.conexao.conectar()
+
+        self.rodada=1
         self.pos_cartas_jog = (400, 400, 66, 90)
         self.sua_pos_carta = (400, 270, 66, 90)
         self.pos_cartas_jog_1 = (266, 170, 66, 90)
@@ -33,7 +37,7 @@ class Gui:
         self.caminho_cartas = "cartas/"
         self.caminho_background = "background/"
         self.lista_cards = []
-        self.cards_selected = []
+        self.cartas_recebidas = []
         self.mao = []
         self.tela = pygame.display.set_mode((500, 400), 0, 32)
         self.icone = pygame.image.load("expresso.png")
@@ -43,7 +47,7 @@ class Gui:
         """Desenha o Botão de truco"""
         pygame.draw.rect(self.tela, (192, 192, 192), (700, 471, 50, 20))
         self.escrever(texto, (700, 471))
-        #card = pygame.draw.rect(janela, (0, 0, 0), (723, 432, 350, 30))
+
 
     def mostra_pontuacao(self):
         """ Renderiza a Pontuação."""
@@ -61,21 +65,30 @@ class Gui:
         self.escrever("[" + str(p_1) + "] | [" + str(p_2) +
                       "] | [" + str(p_3) + "]", (40, 471))
         pygame.display.update()
+    def recebe_cartas(self):
+        """Carrega as cartas recebidas do servidor"""
+        self.conexao.envia_mensagem('0,0,0,0')
+        cartas = self.conexao.ler_socket()
+        print cartas
+        cartas =cartas.split(",")
+        for i in cartas:
+            self.cartas_recebidas.append(i)
 
-    def distribui_cartas(self):
-        """Função de teste.. as cartas devem ser recebidas do servidor"""
-        self.cards_selected[:] = []
-        for k in range(0, 3):
-            valor = random.randint(0, len(self.lista_cards) - 1)
-            if valor in self.cards_selected:
-                self.distribui_cartas()
-            self.cards_selected.append(valor)
+    # def distribui_cartas(self):
+    #     """Função de teste.. as cartas devem ser recebidas do servidor"""
+    #     self.cartas_recebidas[:] = []
+    #     for k in range(0, 3):
+    #         valor = random.randint(0, len(self.lista_cards) - 1)
+    #         if valor in self.cartas_recebidas:
+    #             self.distribui_cartas()
+    #         self.cartas_recebidas.append(valor)
 
     def carrega_cartas(self):
-        """Carrega as imagens das cartas"""
-        for naipe_cards in os.listdir(self.caminho_cartas):
-            if (".png") in naipe_cards:
-                self.lista_cards.append(naipe_cards)
+        """Carrega o caminho das imagens recebidas do servidor"""
+        for i in range(0,3):
+            self.mao.append(self.caminho_cartas+self.cartas_recebidas[i]+".png")
+        self.mao.append(self.caminho_cartas+"verso/V.png")
+
 
     def update_card(self, card, posicao):
         """Atualiza o desenho das cartas"""
@@ -115,10 +128,13 @@ class Gui:
 
     def jogar_carta(self, carta):
         """Desenha a cart que foi jogada"""
-        card_king = pygame.image.load(carta)
-        king_rect = card_king.get_rect()
+        card = pygame.image.load(carta)
+        card_rect = card.get_rect()
         # (Largura)
-        self.tela.blit(card_king, self.sua_pos_carta)
+        self.tela.blit(card, self.sua_pos_carta)
+        carta = carta.split("/")[1].split(".")[0]
+        self.conexao.envia_mensagem("0,0,0,"+carta+",0")
+
 
     def iniciar(self):
         """Tela inicial"""
@@ -128,13 +144,6 @@ class Gui:
         truco = pygame.image.load("background/background.png")
         self.tela.blit(truco, (0, 0))
         self.tela.blit(label, (120, 370))
-
-    def gera_mao(self):
-        """Gera a mão a partir das listas de cartas selecionadas"""
-        for i in self.cards_selected:
-            print "Valor de I", i, "Tamanho ", len(self.lista_cards)
-            self.mao.append(self.caminho_cartas + self.lista_cards[i])
-        self.mao.append(self.caminho_cartas + "/verso/V.png")
 
     def novo_tamanho_janela(self):
         "Largura x Altura"
@@ -149,9 +158,7 @@ class Gui:
         self.tela.blit(label, posicao)
 
     def main(self):
-        self.carrega_cartas()
-        self.distribui_cartas()
-        self.gera_mao()
+        #self.carrega_cartas()
 
         pygame.init()
 
@@ -184,12 +191,14 @@ class Gui:
                     if op == "3":
                         self.update_card(self.mao[2], self.pos_cartas_jog)
                         carta_selecionada = 2
-                    if op == "275" or op == "276":
+                    if (op == "275" or op == "276") and self.rodada is not 1:
                         """Teclas de Seta esq e dir
                             carta oculta
                         """
                         self.update_card(self.mao[3], self.pos_cartas_jog)
                         carta_selecionada = 3
+                    else:
+                        print "Jogada não permitida."
                     if op == "273":
                         print "carta jogada", self.mao[carta_selecionada]
                         if (carta_selecionada != -1):
@@ -240,7 +249,7 @@ class Gui:
             # update_card(tela,None)
             pygame.display.update()
 if __name__ == '__main__':
-    newgui = Gui()
-    #newconect = Conexao()
-    #newconect.conectar()
-    newgui.main()
+    new = Gui()
+    new.recebe_cartas()
+    new.carrega_cartas()
+    new.main()
