@@ -2,6 +2,16 @@
 import socket
 import os
 """
+Cliente
+Tp de Redes - Truco
+UFSJ
+Carlos Magno
+Lucas Geraldo
+
+Requisitos:
+*python 2.7
+*pygame
+
 Modulo de conexão.
 Versão Inicial
 """

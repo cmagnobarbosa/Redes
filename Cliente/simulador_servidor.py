@@ -4,6 +4,7 @@ Este modulo vai simular a comunicação com servidor..
 Modulo simula a iteração do servidor
 """
 import socket
+import time
 HOST = ''              # Endereco IP do Servidor
 PORT = 5001            # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,7 +28,7 @@ while(True):
     if msg == "0,0,0,0":
         "Inicio do jogo"
         print "The begin"
-        con.send('4O,3C,AP')
+        con.send('2P,7C,AP')
         msg = ""
     else:
         print msg
@@ -36,6 +37,10 @@ while(True):
         msg = con.recv(1024)
         if len(msg)>0:
             print msg
+            time.sleep(1)
+            con.send("1")
         if msg == "Fim":
-            print 'Finalizando conexao do cliente', cliente
+            """Encerra a conexao e fecha o cliente"""
+            print "Fim de Jogo",'Finalizando conexao do cliente', cliente
             con.close()
+            exit()

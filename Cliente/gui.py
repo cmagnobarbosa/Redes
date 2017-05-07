@@ -1,10 +1,11 @@
 # coding: utf-8
 import pygame
+import pygame.gfxdraw
 import sys
 from pygame.locals import *
 import os
 import random
-from conexao import *
+
 # Modulo de conexão
 """
 Cliente
@@ -17,6 +18,8 @@ Requisitos:
 *python 2.7
 *pygame
 
+Modulo de GUI.
+
 """
 
 
@@ -25,10 +28,9 @@ class Gui():
 
     def __init__(self):
         """A lista da mão deve ser recebida do servidor"""
-        self.conexao = Conexao()
-        self.conexao.conectar()
 
-        self.rodada=1
+
+
         self.pos_cartas_jog = (400, 400, 66, 90)
         self.sua_pos_carta = (400, 270, 66, 90)
         self.pos_cartas_jog_1 = (266, 170, 66, 90)
@@ -65,10 +67,11 @@ class Gui():
         self.escrever("[" + str(p_1) + "] | [" + str(p_2) +
                       "] | [" + str(p_3) + "]", (40, 471))
         pygame.display.update()
-    def recebe_cartas(self):
+    def recebe_cartas(self,conexao):
+        """ Possui o socket de conexão como parametro de entrada."""
         """Carrega as cartas recebidas do servidor"""
-        self.conexao.envia_mensagem('0,0,0,0')
-        cartas = self.conexao.ler_socket()
+        conexao.envia_mensagem('0,0,0,0')
+        cartas = conexao.ler_socket()
         print cartas
         cartas =cartas.split(",")
         for i in cartas:
@@ -93,47 +96,64 @@ class Gui():
     def update_card(self, card, posicao):
         """Atualiza o desenho das cartas"""
         """(posicao_horizontal,posicao_vertical,d_altura,d_largura)"""
-        card = pygame.image.load(card)
-        #(X,Y,Largura,Altura)
-        self.tela.blit(card, posicao)
+        if card is not None:
+            card = pygame.image.load(card)
+            #(X,Y,Largura,Altura)
+            self.tela.blit(card, posicao)
 
     def update_card_adversario(self, jogador, carta):
         """Essa função atualiza a exibição do verso da carta dos adversários"""
         """ O valor jogador 0 é o estado inicial"""
         print "Carta ", carta, "Jogador ", jogador
-        if carta is 3:
-            carta = self.caminho_cartas + "/miniatura/3_cards.png"
-        if carta is 2:
-            carta = self.caminho_cartas + "/miniatura/2_cards.png"
-        if carta is 1:
-            carta = self.caminho_cartas + "/miniatura/1_card.png"
-        card = pygame.image.load(carta)
-
-        if jogador is 1 or jogador is 0:
-            self.tela.blit(card, (4, 212, 54, 43))
-
-        if jogador == 2 or jogador is 0:
-            #(X,Y,Largura,Altura)
-            card = pygame.transform.rotate(card, -90)
-            self.tela.blit(card, (400, 2, 54, 43))
-
-        if jogador == 3 or jogador is 0:
+        if carta is not None:
+            if carta is 3:
+                carta = self.caminho_cartas + "/miniatura/3_cards.png"
+            if carta is 2:
+                carta = self.caminho_cartas + "/miniatura/2_cards.png"
+            if carta is 1:
+                carta = self.caminho_cartas + "/miniatura/1_card.png"
             card = pygame.image.load(carta)
-            card = pygame.transform.rotate(card, 180)
-            self.tela.blit(card, (750, 212, 54, 43))
+
+            if jogador is 1 or jogador is 0:
+                self.tela.blit(card, (4, 212, 54, 43))
+
+            if jogador == 2 or jogador is 0:
+                #(X,Y,Largura,Altura)
+                card = pygame.transform.rotate(card, -90)
+                self.tela.blit(card, (400, 2, 54, 43))
+
+            if jogador == 3 or jogador is 0:
+                card = pygame.image.load(carta)
+                card = pygame.transform.rotate(card, 180)
+                self.tela.blit(card, (750, 212, 54, 43))
+
+    def verifica_mao(self,mao,conexao):
+        """Verifica a mão e encerra a conexao com o servidor"""
+        cont = 0
+        for i in mao:
+            if i is None:
+                cont=cont+1
+        if cont >= 3:
+            print("Fim de Jogo")
+            conexao.envia_mensagem("Fim")
+            conexao.encerra_conexao()
+
 
     def renderiza_cartas_jogadas(self, carta_jogada, posicao):
         """Renderiza a carta jogada"""
         self.update_card(carta_jogada, posicao)
 
-    def jogar_carta(self, carta):
+    def jogar_carta(self, carta, conexao):
         """Desenha a cart que foi jogada"""
-        card = pygame.image.load(carta)
-        card_rect = card.get_rect()
-        # (Largura)
-        self.tela.blit(card, self.sua_pos_carta)
-        carta = carta.split("/")[1].split(".")[0]
-        self.conexao.envia_mensagem("0,0,0,"+carta+",0")
+        if carta is not None:
+            card = pygame.image.load(carta)
+            card_rect = card.get_rect()
+            # (Largura)
+            self.tela.blit(card, self.sua_pos_carta)
+            carta = carta.split("/")[1].split(".")[0]
+            print carta
+            conexao.envia_mensagem("0,0,0,"+carta+",0")
+            return 0
 
 
     def iniciar(self):
@@ -157,99 +177,39 @@ class Gui():
         #(X,y)
         self.tela.blit(label, posicao)
 
-    def main(self):
-        #self.carrega_cartas()
 
-        pygame.init()
+    def tela_padrao(self):
+        fundo = pygame.image.load("background/fundo.jpg")
+        self.tela.blit(fundo, [0, 0])
+        self.rodadas()
+        self.mostra_pontuacao()
+        self.desenha_botao_truco("Truco")
+        self.update_card_adversario(0, 3)
+        self.escrever(
+            "Para selecionar cartas escolha [1,2,3]", (30, 30))
+        self.escrever(
+            "Para Jogar a carta utilize seta para frente", (30, 50))
+        self.escrever(
+            "Utilize as setas direcionais para ocultar", (30, 70))
+        #self.tela.blit(truco,(200,170,450,100))
 
-        pygame.display.set_caption("Truco")
-        pygame.DOUBLEBUF
 
-        self.iniciar()
+    def tela_truco(self):
+        """Renderiza a tela de Truco e retorna a resposta"""
+        truco = pygame.image.load("truco.png")
+        tamanho = pygame.Surface.get_rect(truco)
+        self.tela.blit(truco,(200,170,450,100))
+        # truco.fill((0,0,0,0))
+        # truco.set_alpha(255)
 
-        carta_selecionada = -1
-        select = 0
+        #print type(truco)
 
-        while True:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == KEYDOWN:
-                    op = event.unicode
-                    print op
-                    op = str(op)
-                    if op is "":
-                        op = str(event.key)
-                        print op
-                    if op == "1":
-                        self.update_card(self.mao[0], self.pos_cartas_jog)
-                        carta_selecionada = 0
-                    if op == "2":
-                        self.update_card(self.mao[1], self.pos_cartas_jog)
-                        carta_selecionada = 1
-                    if op == "3":
-                        self.update_card(self.mao[2], self.pos_cartas_jog)
-                        carta_selecionada = 2
-                    if (op == "275" or op == "276") and self.rodada is not 1:
-                        """Teclas de Seta esq e dir
-                            carta oculta
-                        """
-                        self.update_card(self.mao[3], self.pos_cartas_jog)
-                        carta_selecionada = 3
-                    else:
-                        print "Jogada não permitida."
-                    if op == "273":
-                        print "carta jogada", self.mao[carta_selecionada]
-                        if (carta_selecionada != -1):
-                            self.jogar_carta(self.mao[carta_selecionada])
-                            # Update a carta do adversario para teste
-                            # Atualiza as cartas em miniatura
-                            #---------------------------------------
-                            self.update_card_adversario(1, 1)
-                            self.update_card_adversario(2, 1)
-                            self.update_card_adversario(3, 1)
-                            #---------------------------------------
-                            # Renderiza as cartas que foram jogadas
-                            #---------------------------------------
-                            self.renderiza_cartas_jogadas(
-                                self.mao[carta_selecionada], self.pos_cartas_jog_1)
-                            self.renderiza_cartas_jogadas(
-                                self.mao[carta_selecionada], self.pos_cartas_jog_2)
-                            self.renderiza_cartas_jogadas(
-                                self.mao[carta_selecionada], self.pos_cartas_jog_3)
-                            #--------------------------------------
+        #0,0,0,0 clear..
+        # pygame.gfxdraw.box(self.tela, pygame.Rect(427,204,65,60), (192,192,192,192))
+        # self.escrever("TRUCO",(427,204))
+        # self.escrever("",(427,204))
 
-                if event.type == MOUSEBUTTONDOWN and select == 0:
-                    """Define a mudança da tela"""
-                    print event.button, event.pos
-                    fundo = pygame.image.load(
-                        self.caminho_background + "fundo.jpg")
-                    self.novo_tamanho_janela()
-                    self.tela.blit(fundo, [0, 0])
-                    self.rodadas()
-                    self.mostra_pontuacao()
-                    self.desenha_botao_truco("Truco")
-
-                    self.update_card_adversario(0, 3)
-                    self.escrever(
-                        "Para selecionar cartas escolha [1,2,3]", (30, 30))
-                    self.escrever(
-                        "Para Jogar a carta utilize seta para frente", (30, 50))
-                    self.escrever(
-                        "Utilize as setas direcionais para ocultar", (30, 70))
-                    select = 1
-                if event.type == MOUSEBUTTONDOWN:
-                    pos = event.pos
-                    print "Posicao ", pos
-                    if (pos[0] > 700 and pos[0] < 750):
-                        if(pos[1] > 471 and pos[1] < 471 + 20):
-                            self.desenha_botao_truco("Seis")
-
-            # update_card(tela,None)
-            pygame.display.update()
-if __name__ == '__main__':
-    new = Gui()
-    new.recebe_cartas()
-    new.carrega_cartas()
-    new.main()
+    def pause(self):
+        print "Jogo pausado Aguarde..."
+        pygame.time.delay(4000)
+        print "Fim do pause.."
