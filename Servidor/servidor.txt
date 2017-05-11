@@ -1,1 +1,9 @@
 O servidor deve ser implementado na linguagem C utilizando somente sockets.
+
+Etapas:
+- Definir função distribuição das cartas
+-
+
+
+
+
