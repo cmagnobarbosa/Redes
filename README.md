@@ -1,7 +1,7 @@
 # Redes
 Tp de Redes
 
-## Autores
+## Desenvolvedores do Projeto
 ![](https://github.com/Exterminus.png?size=100)
 Carlos Magno ([github](https://github.com/Exterminus))
 
