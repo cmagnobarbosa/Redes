@@ -25,39 +25,39 @@ void embaralhar(carta baralho[40]){
 /* Esta função atribui os nomes e valores de cada carta
    do baralho de truco a uma poisição do array baralho */
 	// As cartas estão ordenadas por ordem decrescente de valor
-	strcpy(baralho[0].nome ,"4p"); baralho[0].valor = 14;
-	strcpy(baralho[1].nome ,"7c"); baralho[1].valor = 13;
-	strcpy(baralho[2].nome ,"Ae"); baralho[2].valor = 12;
-	strcpy(baralho[3].nome ,"7o"); baralho[3].valor = 11;
+	strcpy(baralho[0].nome , "4p"); baralho[0].valor = 14;
+	strcpy(baralho[1].nome , "7c"); baralho[1].valor = 13;
+	strcpy(baralho[2].nome , "ae"); baralho[2].valor = 12;
+	strcpy(baralho[3].nome , "7o"); baralho[3].valor = 11;
 
-	strcpy(baralho[4].nome ,"3p"); baralho[4].valor = 10; 
-	strcpy(baralho[5].nome ,"3c"); baralho[5].valor = 10; 
-	strcpy(baralho[6].nome ,"3e"); baralho[6].valor = 10; 
-	strcpy(baralho[7].nome ,"3o"); baralho[7].valor = 10; 
+	strcpy(baralho[4].nome , "3p"); baralho[4].valor = 10; 
+	strcpy(baralho[5].nome , "3c"); baralho[5].valor = 10; 
+	strcpy(baralho[6].nome , "3e"); baralho[6].valor = 10; 
+	strcpy(baralho[7].nome , "3o"); baralho[7].valor = 10; 
 
-	strcpy(baralho[8].nome ,"2p"); baralho[8].valor = 9;
-	strcpy(baralho[9].nome ,"2c"); baralho[9].valor = 9;
+	strcpy(baralho[8].nome , "2p"); baralho[8].valor = 9;
+	strcpy(baralho[9].nome , "2c"); baralho[9].valor = 9;
 	strcpy(baralho[10].nome, "2e"); baralho[10].valor = 9;
 	strcpy(baralho[11].nome, "2o"); baralho[11].valor = 9;
 
-	strcpy(baralho[12].nome, "Ap"); baralho[12].valor = 8;
-	strcpy(baralho[13].nome, "Ac"); baralho[13].valor = 8;
-	strcpy(baralho[14].nome, "Ao"); baralho[14].valor = 8;
+	strcpy(baralho[12].nome, "ap"); baralho[12].valor = 8;
+	strcpy(baralho[13].nome, "ac"); baralho[13].valor = 8;
+	strcpy(baralho[14].nome, "ao"); baralho[14].valor = 8;
 
-	strcpy(baralho[15].nome, "Kp"); baralho[15].valor = 7;
-	strcpy(baralho[16].nome, "Kc"); baralho[16].valor = 7;
-	strcpy(baralho[17].nome, "Ke"); baralho[17].valor = 7;
-	strcpy(baralho[18].nome, "Ko"); baralho[18].valor = 7;  
+	strcpy(baralho[15].nome, "kp"); baralho[15].valor = 7;
+	strcpy(baralho[16].nome, "kc"); baralho[16].valor = 7;
+	strcpy(baralho[17].nome, "ke"); baralho[17].valor = 7;
+	strcpy(baralho[18].nome, "ko"); baralho[18].valor = 7;  
 
-	strcpy(baralho[19].nome, "Jp"); baralho[19].valor = 6;
-	strcpy(baralho[20].nome, "Jc"); baralho[20].valor = 6;
-	strcpy(baralho[21].nome, "Je"); baralho[21].valor = 6;
-	strcpy(baralho[22].nome, "Jo"); baralho[22].valor = 6;
+	strcpy(baralho[19].nome, "jp"); baralho[19].valor = 6;
+	strcpy(baralho[20].nome, "jc"); baralho[20].valor = 6;
+	strcpy(baralho[21].nome, "je"); baralho[21].valor = 6;
+	strcpy(baralho[22].nome, "jo"); baralho[22].valor = 6;
 
-	strcpy(baralho[23].nome, "Qp"); baralho[23].valor = 5;
-	strcpy(baralho[24].nome, "Qc"); baralho[24].valor = 5;
-	strcpy(baralho[25].nome, "Qe"); baralho[25].valor = 5;
-	strcpy(baralho[26].nome, "Qo"); baralho[26].valor = 5;
+	strcpy(baralho[23].nome, "qp"); baralho[23].valor = 5;
+	strcpy(baralho[24].nome, "qc"); baralho[24].valor = 5;
+	strcpy(baralho[25].nome, "qe"); baralho[25].valor = 5;
+	strcpy(baralho[26].nome, "qo"); baralho[26].valor = 5;
 
 	strcpy(baralho[27].nome, "7p"); baralho[27].valor = 4;
 	strcpy(baralho[28].nome, "7e"); baralho[28].valor = 4;
@@ -105,11 +105,11 @@ void distribuir(carta baralho[40], jogador clientes[4]){
 void broadCast(jogador clientes[4]){
 /* Esta funçaõ realiza o envio de uma mensagem padrao para todos os clientes */
 	write(clientes[0].porta, clientes[0].mao, 6);
-	sleep(3);
+	sleep(1);
 	write(clientes[1].porta, clientes[1].mao, 6);
-	sleep(3);
+	sleep(1);
 	write(clientes[2].porta, clientes[2].mao, 6);
-	sleep(3);
+	sleep(1);
 	write(clientes[3].porta, clientes[3].mao, 6);
 }
 
@@ -131,8 +131,10 @@ int main(){
 	struct sockaddr_in endereco_servidor, endereco_cliente;
 
 	//Variaveis do jogo
+	int i, saida=0, volta;
 	carta baralho[40];
-	int i;
+
+	
 
 	// Abrindo o socket
 	socket_con = socket(AF_INET, SOCK_STREAM,0); 
@@ -155,16 +157,18 @@ int main(){
 	listen(socket_con, 5);
 	
 	//Estabelece a conexão com os clientes.
-	for(i = 0; i < 4; i++)
+	for(i = 0; i < 4; i++){
 		clientes[i].porta = accept(socket_con,(struct sockaddr *) &endereco_cliente, &cliente_len);
+		clientes[i].id = i;
+	}
 	
-
 	if(clientes[0].porta < 0 || clientes[1].porta < 0 || 
 	   clientes[2].porta < 0 || clientes[3].porta < 0)
-		printf("Erro ao conectar com o cliente.\n");
-	else
-		printf("Conectado aos clientes: %d, %d, %d, %d\n",
-		clientes[0].porta, clientes[1].porta, clientes[2].porta, clientes[3].porta);
+	   printf("Erro ao conectar com o cliente.\n");
+	else{
+		for(i = 0; i < 4; i++)
+			printf("Conectado ao cliente: %d porta %d\n", clientes[i].id, clientes[i].porta);
+	}		
 
 	cliente_len = sizeof(endereco_cliente);	//???
 
@@ -174,6 +178,14 @@ int main(){
 		embaralhar(baralho);
 		distribuir(baralho, clientes);
 		broadCast(clientes);
+
+		volta = saida;
+		write(clientes[volta].porta, "sua vez!", 8);
+		read(clientes[volta].porta, mensagem, 23);
+
+		printf("\n%s\n",mensagem );
+
+
 		
 		//Zera o buffer de mensagens		
 		bzero(mensagem, 23);

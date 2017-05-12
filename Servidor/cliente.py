@@ -12,11 +12,14 @@ cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Definicao do servi
 
 cliente.connect((ipServidor, portaServidor))
 
-cliente.send('lucas')
+#cliente.send('lucas')
 
 # Resposta do servidor
 data = cliente.recv(1024)
+print '\n' + data
+data = cliente.recv(1024)
 print data
-print type(data)
+cliente.send('lucas')
+
 
 cliente.close()
