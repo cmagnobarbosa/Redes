@@ -90,7 +90,7 @@ class Gui():
         """Carrega o caminho das imagens recebidas do servidor"""
         for i in range(0,3):
             self.mao.append(self.caminho_cartas+self.cartas_recebidas[i]+".png")
-        self.mao.append(self.caminho_cartas+"verso/V.png")
+        self.mao.append(self.caminho_cartas+"verso/v.png")
 
 
     def update_card(self, card, posicao):
@@ -153,7 +153,7 @@ class Gui():
             carta = carta.split("/")[1].split(".")[0]
             print carta
             conexao.envia_mensagem("0,0,0,"+carta+",0")
-            return 0
+            return 1
 
 
     def iniciar(self):

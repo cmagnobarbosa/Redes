@@ -1,9 +1,13 @@
 # coding: utf-8
+
 import pygame
 import sys
 from pygame.locals import *
 from gui import *
 from conexao import *
+from Queue import Queue
+from threading import Thread
+
 """
 Cliente
 Tp de Redes - Truco
@@ -34,16 +38,21 @@ class Principal(Gui):
         self.gui.carrega_cartas()
         self.flag_carta_jogada=0
         self.flag_next =1
+        self.quee= Queue()
 
 
-    def verifica_resposta_servidor(self):
-        while(True):
-            permissao = self.conexao.ler_socket()
-            print"Leitura,",permissao
-            if permissao == 1:
-                return 1
+    def verifica_resposta_servidor(self,fila,conexao):
+        """Verifica a conexao.."""
+        palavra=conexao.ler_socket()
+        print "Retorno ",palavra
+        fila.put(palavra)
+        fila.task_done()
+
+
+
 
     def main(self):
+        """Realiza a renderização.."""
 
         pygame.init()
 
@@ -56,6 +65,8 @@ class Principal(Gui):
 
         self.carta_selecionada = -1
         select = 0
+
+        #thread.start_new_thread(self.verifica_resposta_servidor,[self.conexao])
 
         while True:
 
@@ -156,7 +167,13 @@ class Principal(Gui):
             # update_card(tela,None)
             pygame.display.update()
             if self.flag_carta_jogada is 1:
-                self.flag_carta_jogada=self.verifica_resposta_servidor()
+
+                verifica = Thread(target=self.verifica_resposta_servidor,args=(self.quee,self.conexao))
+                # verifica.setDaemon(True)
+                verifica.start()
+                for i in range(0,1):
+                    print self.quee.get()
+                    self.flag_carta_jogada=0
 
 if __name__ == '__main__':
     new = Principal()

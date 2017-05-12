@@ -6,7 +6,7 @@ Modulo simula a iteração do servidor
 import socket
 import time
 HOST = ''              # Endereco IP do Servidor
-PORT = 5001            # Porta que o Servidor esta
+PORT = 5002            # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
 tcp.bind(orig)
@@ -28,7 +28,7 @@ while(True):
     if msg == "0,0,0,0":
         "Inicio do jogo"
         print "The begin"
-        con.send('2P,7C,AP')
+        con.send('2p,7c,ap')
         msg = ""
     else:
         print msg

@@ -22,7 +22,7 @@ class Conexao:
 
     def __init__(self):
         self.servidor_end = '127.0.0.1'     # Endereco IP do Servidor
-        self.porta = 5001
+        self.porta = 5002
         self.socket = ""                           # Porta que o Servidor esta
         #self.socket_conexao = None                #Socket de conexao.
 
@@ -33,8 +33,10 @@ class Conexao:
 
     def ler_socket(self):
         """Realiza a leitura do socket e retorna os dados que foram lidos."""
+        retorno = None
         retorno= self.socket.recv(1024)
-        if len(retorno)>0:
+        if retorno is not None and len(retorno)>0:
+            #print retorno
             return retorno
     def encerra_conexao(self):
         "Encerra a conexao com servidor."
