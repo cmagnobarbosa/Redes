@@ -6,4 +6,4 @@ Tp de Redes
 Carlos Magno ([github](https://github.com/Exterminus))
 
 ![](https://github.com/Lucasgscruz.png?size=100)
-Lucas Cruz ([github](https://github.com/brunolemos))
+Lucas Cruz ([github](https://github.com/lucasgscruz))
