@@ -21,6 +21,119 @@ Universidade Federal de São João del Rei - UFSJ
 #include <netinet/in.h>
 #include "header.h"
 
+void embaralhar(carta baralho[40]);
+
+void distribuir(carta baralho[40], jogador clientes[4]);
+
+void broadCast(jogador clientes[4], char mensagem[32]);
+
+int getValor(char *nome, carta baralho[40]);
+
+char* getToken(char mensagem[32], int inicio, int fim, char *token);
+
+void setToken(char mensagem[32], int inicio, int fim, char *token);
+
+int main(){
+	/* Variaveis para estabelecer a comunicacao */
+	int socket_con = 0, num_porta = 5003, temp = 0;
+	socklen_t cliente_len;
+	struct sockaddr_in endereco_servidor, endereco_cliente;
+
+	/* Variaveis do jogo */
+	int i, j, saida=0, volta;
+	char mensagem[32], token[9], strAux[9];
+	carta baralho[40];
+	jogador clientes[4];
+
+	/* Abrindo o socket */
+	socket_con = socket(AF_INET, SOCK_STREAM,0); 
+	if(socket_con < 0)
+		printf("Erro ao criar o socket.\n");
+
+	/* Preenche com zero */
+	bzero((char *)&endereco_servidor, sizeof(endereco_servidor));
+	endereco_servidor.sin_family = AF_INET;
+	endereco_servidor.sin_addr.s_addr = INADDR_ANY;
+	endereco_servidor.sin_port = htons(num_porta);
+
+	/* Associa uma porta ao socket */
+	if (bind(socket_con, (struct sockaddr *) &endereco_servidor,sizeof(endereco_servidor)) < 0)
+		printf("Erro ao Abrir a porta.\n");
+	else
+		printf("Aguardando conexão dos clientes...\n");	
+
+	/* Tamanho maximo da fila de clientes. */
+	listen(socket_con, 5);
+	
+	/* Estabelece a conexão com os clientes */
+	for(i = 0; i < 4; i++){
+		clientes[i].porta = accept(socket_con,(struct sockaddr *) &endereco_cliente, &cliente_len);
+		bzero(strAux,9);	
+		strAux[0] = i + 49;
+		strcpy(clientes[i].id, strAux); // Atribuindo id
+
+		if(i % 2 == 0)
+			strcpy(clientes[i].equipe, "a"); // Atribuindo a equipe A
+		else
+			strcpy(clientes[i].equipe, "b"); // Atribuindo a equipe B
+	}
+
+	if(clientes[0].porta < 0 || clientes[1].porta < 0 || 
+	   clientes[2].porta < 0 || clientes[3].porta < 0)
+	   printf("Erro ao conectar com o cliente.\n");
+	else{
+		for(i = 0; i < 4; i++)
+			printf("Conectado ao cliente: %s porta %d\n", clientes[i].id, clientes[i].porta);
+	}		
+
+	cliente_len = sizeof(endereco_cliente);	//???
+
+
+	/* Loop para troca de mensagens com o(s) cliente(s) */
+
+	/*  Realiza a leitura do socket do cliente
+		temp = read(clientes[0].porta, mensagem, 23);
+		printf("Mensagem: %s   e o temp vale: %d\n", mensagem,temp); 
+
+		Escreve uma reposta no socket para o cliente.
+		O último parametro é o numero de bytes */
+
+	for(;;){
+		embaralhar(baralho);
+		distribuir(baralho, clientes);
+
+		bzero(mensagem, 32); //Zera o buffer de mensagens
+		strcpy(mensagem, "0000000000000000000000000000000"); // Mensagem inicial
+		broadCast(clientes, mensagem);
+
+		// for(i = 0; i < 3; i++) // Turnos: 3 rodadas
+		// 	for(j = 0; j < 4; j++) // Jogadores do turno: 4 jogadas 
+
+
+		// write(clientes[0].porta, "1a004p7c7o000000000000000000000", 32);
+		// write(clientes[1].porta, "1a004p7c7o000000000000000000000", 32);
+		// write(clientes[2].porta, "1a004p7c7o000000000000000000000", 32);
+		// write(clientes[3].porta, "1a004p7c7o000000000000000000000", 32);
+
+		//read(clientes[volta].porta, mensagem, 23);
+
+
+		
+
+		
+		break;
+	}
+
+	/* Fecha o socket de conexão com o cliente */
+	for(i = 0; i < 4; i++)
+		close(clientes[i].porta);
+   
+	/* Fecha o socket que está ouvindo a porta */
+	close(socket_con);
+
+	return 0;
+}
+
 void embaralhar(carta baralho[40]){
 /* Esta função atribui os nomes e valores de cada carta
    do baralho de truco a uma poisição do array baralho */
@@ -94,7 +207,7 @@ void distribuir(carta baralho[40], jogador clientes[4]){
     }
 
     for(i = 0; i < 4; i++){
-    	bzero(clientes[i].mao, 6);
+    	bzero(clientes[i].mao, 7);
     	for(j = 0; j < 3; j++){
     		strcat(clientes[i].mao, baralho[card[k]].nome);
     		k++;
@@ -102,109 +215,49 @@ void distribuir(carta baralho[40], jogador clientes[4]){
     }
 }
 
-void broadCast(jogador clientes[4]){
+void broadCast(jogador clientes[4], char mensagem[32]){
 /* Esta funçaõ realiza o envio de uma mensagem padrao para todos os clientes */
-	write(clientes[0].porta, clientes[0].mao, 6);
-	sleep(1);
-	write(clientes[1].porta, clientes[1].mao, 6);
-	sleep(1);
-	write(clientes[2].porta, clientes[2].mao, 6);
-	sleep(1);
-	write(clientes[3].porta, clientes[3].mao, 6);
+	
+	int i;
+	
+	for(i = 0; i < 4; i++){
+		setToken(mensagem, 0, 0, clientes[i].id);
+		setToken(mensagem, 1, 1, clientes[i].equipe);
+		setToken(mensagem, 4, 9, clientes[i].mao);
+		write(clientes[i].porta, mensagem, 32);
+		sleep(2);
+	}
 }
 
-// int getValor(char *nome, carta baralho[40]){
-//  Retorna o valor de uma carta com base no nome da mesma 
-// 	int i;
-// 	for(i = 0; i < 40; i++){
-// 		if(baralho[i].nome == nome)
-// 	}
-
-// }
-
-int main(){
-	//Variaveis para estabelecer a comunicacao
-	int socket_con = 0, num_porta = 5003, temp = 0;
-	jogador clientes[4];
-	char mensagem[23];
-	socklen_t cliente_len;
-	struct sockaddr_in endereco_servidor, endereco_cliente;
-
-	//Variaveis do jogo
-	int i, saida=0, volta;
-	carta baralho[40];
-
+int getValor(char *nome, carta baralho[40]){
+/* Retorna o valor de uma carta com base no nome da mesma */ 
 	
-
-	// Abrindo o socket
-	socket_con = socket(AF_INET, SOCK_STREAM,0); 
-	if(socket_con < 0)
-		printf("Erro ao criar o socket.\n");
-
-	//Preenche com zero.
-	bzero((char *)&endereco_servidor, sizeof(endereco_servidor));
-	endereco_servidor.sin_family = AF_INET;
-	endereco_servidor.sin_addr.s_addr = INADDR_ANY;
-	endereco_servidor.sin_port = htons(num_porta);
-
-	//Associa uma porta ao socket
-	if (bind(socket_con, (struct sockaddr *) &endereco_servidor,sizeof(endereco_servidor)) < 0)
-		printf("Erro ao Abrir a porta.\n");
-	else
-		printf("Aguardando conexão dos clientes...\n");	
-
-	//Tamanho maximo da fila de clientes.
-	listen(socket_con, 5);
-	
-	//Estabelece a conexão com os clientes.
-	for(i = 0; i < 4; i++){
-		clientes[i].porta = accept(socket_con,(struct sockaddr *) &endereco_cliente, &cliente_len);
-		clientes[i].id = i;
+	int i;
+	for(i = 0; i < 40; i++){
+		if(strcmp(baralho[i].nome, nome) == 0)
+			return baralho[i].valor;
 	}
+}
+
+char* getToken(char mensagem[32], int inicio, int fim, char *token){
+/* Retorna um trecho específico da mensagem delimitado por 'inicio' e 'fim' */
+
+	bzero(token,8);
+	int i, j = 0;
+	for(i = inicio ; i <= fim; i++){
+		token[j] = mensagem[i];
+		j++;
+	}
+
+	return token;
+}
+
+void setToken(char mensagem[32], int inicio, int fim, char *token){
+/* Altera um trecho especifico da mensagem delimitado por 'inicio' e 'fim' */
 	
-	if(clientes[0].porta < 0 || clientes[1].porta < 0 || 
-	   clientes[2].porta < 0 || clientes[3].porta < 0)
-	   printf("Erro ao conectar com o cliente.\n");
-	else{
-		for(i = 0; i < 4; i++)
-			printf("Conectado ao cliente: %d porta %d\n", clientes[i].id, clientes[i].porta);
-	}		
-
-	cliente_len = sizeof(endereco_cliente);	//???
-
-
-	//Loop para troca de mensagens com o(s) cliente(s).
-	//for(;;){
-		embaralhar(baralho);
-		distribuir(baralho, clientes);
-		broadCast(clientes);
-
-		volta = saida;
-		write(clientes[volta].porta, "sua vez!", 8);
-		read(clientes[volta].porta, mensagem, 23);
-
-		printf("\n%s\n",mensagem );
-
-
-		
-		//Zera o buffer de mensagens		
-		bzero(mensagem, 23);
-
-		//Realiza a leitura do socket do cliente
-		/*temp = read(clientes[0].porta, mensagem, 23);
-		printf("Mensagem: %s   e o temp vale: %d\n", mensagem,temp); */
-
-		/*Escreve uma reposta no socket para o cliente.
-		  O último parametro é o numero de bytes */
-		
-	//}
-
-	//Fecha o socket de conexão com o cliente.
-	for(i = 0; i < 4; i++)
-		close(clientes[i].porta);
-   
-	//Fecha o socket que está ouvindo a porta.
-	close(socket_con);
-
-	return 0;
+	int i, j = 0;
+	for(i = inicio; i <= fim; i++){
+		mensagem[i] = token[j]; 
+		j++;
+	}
 }
