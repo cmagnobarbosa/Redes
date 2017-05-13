@@ -5,13 +5,20 @@ Modulo simula a iteração do servidor
 """
 import socket
 import time
+
+
+def ler_config():
+    arquivo = open("config", "r")
+    for i in arquivo:
+        return int(i)
+
 HOST = ''              # Endereco IP do Servidor
-PORT = 5002            # Porta que o Servidor esta
+PORT = ler_config()    # Porta que o Servidor esta
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 orig = (HOST, PORT)
 tcp.bind(orig)
 tcp.listen(2)
-lista=[]
+lista = []
 print "Aguardando cliente..."
 while(True):
     con, cliente = tcp.accept()
@@ -25,22 +32,18 @@ while(True):
     """
 
     msg = con.recv(1024)
-    if msg == "0,0,0,0":
-        "Inicio do jogo"
-        print "The begin"
-        con.send('2p,7c,ap')
-        msg = ""
-    else:
-        print msg
+    print "enviado"
+    con.send('1a004p7c7o000000000000000000000')
+    msg = ""
 
     while(True):
         msg = con.recv(1024)
-        if len(msg)>0:
+        if len(msg) > 0:
             print msg
-            time.sleep(1)
-            con.send("1")
+            time.sleep(5)
+            con.send("00014p7c7o000000000000000000000")
         if msg == "Fim":
             """Encerra a conexao e fecha o cliente"""
-            print "Fim de Jogo",'Finalizando conexao do cliente', cliente
+            print "Fim de Jogo", 'Finalizando conexao do cliente', cliente
             con.close()
             exit()

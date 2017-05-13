@@ -29,69 +29,66 @@ class Gui():
     def __init__(self):
         """A lista da mão deve ser recebida do servidor"""
 
-
-
-        self.pos_cartas_jog = (400, 400, 66, 90)
-        self.sua_pos_carta = (400, 270, 66, 90)
-        self.pos_cartas_jog_1 = (266, 170, 66, 90)
-        self.pos_cartas_jog_2 = (400, 70, 66, 90)
-        self.pos_cartas_jog_3 = (534, 170, 66, 90)
         self.caminho_cartas = "cartas/"
         self.caminho_background = "background/"
+        #-----------------------------------------
+        self.pos_cartas_jog = (400, 400, 66, 90)
+        self.sua_pos_carta = (400, 270, 66, 90)
+        self.pos_cartas_jog_3 = (266, 170, 66, 90)
+        self.pos_cartas_jog_2 = (400, 70, 66, 90)
+        self.pos_cartas_jog_1 = (534, 170, 66, 90)
+
+        #-----------------------------------------
         self.lista_cards = []
         self.cartas_recebidas = []
         self.mao = []
+        #-----------------------
+        self.valor_rodada = "0"
+        self.ponto = "0"
+        self.ponto_ad = "0"
+        self.p_1 = " V "
+        self.p_2 = " X "
+        self.p_3 = " - "
+        #---------------------
+
         self.tela = pygame.display.set_mode((500, 400), 0, 32)
         self.icone = pygame.image.load("expresso.png")
         pygame.display.set_icon(self.icone)
 
+    def atualiza_pontuacao(self, ponto):
+        self.valor_rodada = ponto
+
     def desenha_botao_truco(self, texto):
         """Desenha o Botão de truco"""
-        pygame.draw.rect(self.tela, (192, 192, 192), (700, 471, 50, 20))
-        self.escrever(texto, (700, 471))
-
+        pygame.draw.rect(self.tela, (192, 192, 192), (670, 471, 50, 20))
+        self.escrever(texto, (670, 471))
 
     def mostra_pontuacao(self):
         """ Renderiza a Pontuação."""
         ponto = 0
         ponto_ad = 0
-        self.escrever("Nós: " + str(ponto) + " Eles: " +
-                      str(ponto_ad), (40, 450))
+        pygame.draw.rect(self.tela, (0, 0, 0), (670, 450, 110, 20))
+        pygame.draw.rect(self.tela, (0, 0, 0), (40, 450, 130, 20))
+        self.escrever("Valor Rod: " + self.valor_rodada, (670, 450))
+        self.escrever("Nós: " + self.ponto + " Eles: " +
+                      self.ponto_ad, (40, 450))
 
     def rodadas(self):
         """"Desenha um bloco"""
-        p_1 = " V "
-        p_2 = " X "
-        p_3 = " - "
-        card = pygame.draw.rect(self.tela, (0, 0, 0), (29, 471, 350, 30))
-        self.escrever("[" + str(p_1) + "] | [" + str(p_2) +
-                      "] | [" + str(p_3) + "]", (40, 471))
+        self.p_1 = " A "
+        self.p_2 = " B "
+        self.p_3 = " A "
+        card = pygame.draw.rect(self.tela, (0, 0, 0), (29, 471, 140, 30))
+        self.escrever("[" + self.p_1 + "] | [" + self.p_2 +
+                      "] | [" + self.p_3 + "]", (40, 471))
         pygame.display.update()
-    def recebe_cartas(self,conexao):
-        """ Possui o socket de conexão como parametro de entrada."""
-        """Carrega as cartas recebidas do servidor"""
-        conexao.envia_mensagem('0,0,0,0')
-        cartas = conexao.ler_socket()
-        print cartas
-        cartas =cartas.split(",")
-        for i in cartas:
-            self.cartas_recebidas.append(i)
-
-    # def distribui_cartas(self):
-    #     """Função de teste.. as cartas devem ser recebidas do servidor"""
-    #     self.cartas_recebidas[:] = []
-    #     for k in range(0, 3):
-    #         valor = random.randint(0, len(self.lista_cards) - 1)
-    #         if valor in self.cartas_recebidas:
-    #             self.distribui_cartas()
-    #         self.cartas_recebidas.append(valor)
 
     def carrega_cartas(self):
         """Carrega o caminho das imagens recebidas do servidor"""
-        for i in range(0,3):
-            self.mao.append(self.caminho_cartas+self.cartas_recebidas[i]+".png")
-        self.mao.append(self.caminho_cartas+"verso/v.png")
-
+        for i in range(0, 3):
+            self.mao.append(self.caminho_cartas +
+                            self.cartas_recebidas[i] + ".png")
+        self.mao.append(self.caminho_cartas + "verso/vv.png")
 
     def update_card(self, card, posicao):
         """Atualiza o desenho das cartas"""
@@ -127,17 +124,16 @@ class Gui():
                 card = pygame.transform.rotate(card, 180)
                 self.tela.blit(card, (750, 212, 54, 43))
 
-    def verifica_mao(self,mao,conexao):
+    def verifica_mao(self, mao, conexao):
         """Verifica a mão e encerra a conexao com o servidor"""
         cont = 0
         for i in mao:
             if i is None:
-                cont=cont+1
+                cont = cont + 1
         if cont >= 3:
             print("Fim de Jogo")
             conexao.envia_mensagem("Fim")
             conexao.encerra_conexao()
-
 
     def renderiza_cartas_jogadas(self, carta_jogada, posicao):
         """Renderiza a carta jogada"""
@@ -150,11 +146,7 @@ class Gui():
             card_rect = card.get_rect()
             # (Largura)
             self.tela.blit(card, self.sua_pos_carta)
-            carta = carta.split("/")[1].split(".")[0]
-            print carta
-            conexao.envia_mensagem("0,0,0,"+carta+",0")
             return 1
-
 
     def iniciar(self):
         """Tela inicial"""
@@ -177,7 +169,6 @@ class Gui():
         #(X,y)
         self.tela.blit(label, posicao)
 
-
     def tela_padrao(self):
         fundo = pygame.image.load("background/fundo.jpg")
         self.tela.blit(fundo, [0, 0])
@@ -191,20 +182,19 @@ class Gui():
             "Para Jogar a carta utilize seta para frente", (30, 50))
         self.escrever(
             "Utilize as setas direcionais para ocultar", (30, 70))
-        #self.tela.blit(truco,(200,170,450,100))
-
+        # self.tela.blit(truco,(200,170,450,100))
 
     def tela_truco(self):
         """Renderiza a tela de Truco e retorna a resposta"""
         truco = pygame.image.load("truco.png")
         tamanho = pygame.Surface.get_rect(truco)
-        self.tela.blit(truco,(200,170,450,100))
+        self.tela.blit(truco, (200, 170, 450, 100))
         # truco.fill((0,0,0,0))
         # truco.set_alpha(255)
 
-        #print type(truco)
+        # print type(truco)
 
-        #0,0,0,0 clear..
+        # 0,0,0,0 clear..
         # pygame.gfxdraw.box(self.tela, pygame.Rect(427,204,65,60), (192,192,192,192))
         # self.escrever("TRUCO",(427,204))
         # self.escrever("",(427,204))

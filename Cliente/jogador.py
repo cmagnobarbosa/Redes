@@ -1,4 +1,4 @@
-
+# coding: utf-8
 
 class Jogador:
     """Vai armazenar os dados do jogador"""
