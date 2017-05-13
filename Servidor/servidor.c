@@ -129,10 +129,8 @@ int main(){
 			 			valorRodada, "0", "0",
 			 			"0", mesa, "0");
 
-				
-
-				write(clientes[volta].porta, mensagem, 31); break;
-
+				write(clientes[volta].porta, mensagem, 31); 
+				read(clientes[volta].porta, mensagem, 31);
 			}
 			break;
 		}
