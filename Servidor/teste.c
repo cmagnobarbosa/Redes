@@ -2,24 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-typedef struct carta{
-	char nome[3];
-}carta;
+void unir(char *msg, char *token, char *token2){
+	strcat(msg, token);
+	strcat(msg, token2);
+}
 
 int main(){
 
-	carta lucas[1];
-	char aux[88];
-	bzero(aux,2);	
-	aux[0] = 49;
+	char msg[32] = "000000000000000000000";
+	char token[7] = "lucas";
+	char token2[4] = "Alo";
 
-	strcpy(lucas[0].nome, aux);
+	unir(msg, token, token2);
 
-	printf("valor de lucas: %s\n", lucas[0].nome );
+	printf("Token vale: %s\n", msg );
+
+
 
 	return 0;
-
 }
+
+
 
 
 

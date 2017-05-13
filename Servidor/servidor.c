@@ -33,6 +33,10 @@ char* getToken(char mensagem[32], int inicio, int fim, char *token);
 
 void setToken(char mensagem[32], int inicio, int fim, char *token);
 
+void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char *placarRodada,
+			 char *valorRodada, char *question, char *eqQuestion,
+			 char *respQuestion, char *mesa, char *virada);
+
 int main(){
 	/* Variaveis para estabelecer a comunicacao */
 	int socket_con = 0, num_porta = 5003, temp = 0;
@@ -42,6 +46,8 @@ int main(){
 	/* Variaveis do jogo */
 	int i, j, saida=0, volta;
 	char mensagem[32], token[9], strAux[9];
+	char vez[2], rodada[2], placarJogo[5], placarRodada[4], valorRodada[3];
+	char question[2], eqQuestion[2], respQuestion[2], mesa[9], virada[2];
 	carta baralho[40];
 	jogador clientes[4];
 
@@ -67,9 +73,9 @@ int main(){
 	
 	/* Estabelece a conexão com os clientes */
 	for(i = 0; i < 4; i++){
-		clientes[i].porta = accept(socket_con,(struct sockaddr *) &endereco_cliente, &cliente_len);
+		clientes[i].porta = accept(socket_con,(struct sockaddr *) &endereco_cliente, &cliente_len); // Atribuindo a porta
 		bzero(strAux,9);	
-		strAux[0] = i + 49;
+		strAux[0] = i + 48;
 		strcpy(clientes[i].id, strAux); // Atribuindo id
 
 		if(i % 2 == 0)
@@ -103,22 +109,47 @@ int main(){
 		distribuir(baralho, clientes);
 
 		bzero(mensagem, 32); //Zera o buffer de mensagens
-		strcpy(mensagem, "0000000000000000000000000000000"); // Mensagem inicial
+		strcpy(mensagem, "000000000000000000000000000000E"); // Mensagem inicial
 		broadCast(clientes, mensagem);
 
-		// for(i = 0; i < 3; i++) // Turnos: 3 rodadas
-		// 	for(j = 0; j < 4; j++) // Jogadores do turno: 4 jogadas 
+		volta = saida;
+
+		for(i = 0; i < 3; i++){ // Rodada: 3 turnos
+			rodada[0] = i + 49;
+			strcpy(mesa, "00000000");
+			strcpy(valorRodada, "02");
+			strcpy(placarRodada, getToken(mensagem, 14, 16, placarRodada));
+			strcpy(placarJogo, getToken(mensagem, 10, 13, placarJogo));
+
+			for(j = 0; j < 4; j++){ // Turno: 4 jogadores->(4 jogadas)
+
+				printf("Ate aqui veio de boa, e a mensagem vale: %s\n", mensagem);
+
+				unirMsg(mensagem, "1", rodada, "9999", placarRodada,
+			 			valorRodada, "0", "0",
+			 			"0", mesa, "0");
+
+				
+
+				write(clientes[volta].porta, mensagem, 31); break;
+
+			}
+			break;
+		}
 
 
+		if(saida == 3)
+			saida = 0 ;
+		else
+			saida++;
 		// write(clientes[0].porta, "1a004p7c7o000000000000000000000", 32);
 		// write(clientes[1].porta, "1a004p7c7o000000000000000000000", 32);
-		// write(clientes[2].porta, "1a004p7c7o000000000000000000000", 32);
-		// write(clientes[3].porta, "1a004p7c7o000000000000000000000", 32);
 
-		//read(clientes[volta].porta, mensagem, 23);
+		/*unirMsg(mensagem, vez, rodada, placarJogo, placarRodada,
+			 			valorRodada, question, eqQuestion,
+			 			respQuestion, mesa, virada); */
 
-
-		
+		//read(clientes[volta].porta, mensagem, 23);		
 
 		
 		break;
@@ -224,7 +255,7 @@ void broadCast(jogador clientes[4], char mensagem[32]){
 		setToken(mensagem, 0, 0, clientes[i].id);
 		setToken(mensagem, 1, 1, clientes[i].equipe);
 		setToken(mensagem, 4, 9, clientes[i].mao);
-		write(clientes[i].porta, mensagem, 32);
+		write(clientes[i].porta, mensagem, 31);
 		sleep(2);
 	}
 }
@@ -260,4 +291,55 @@ void setToken(char mensagem[32], int inicio, int fim, char *token){
 		mensagem[i] = token[j]; 
 		j++;
 	}
+}
+
+int vencTurno(char mensagem[32], carta baralho[40]){
+/* Retorna o id do jogador vencedor do turno */
+	char token[3];
+	int i, carta[4];
+
+	carta[0] = getValor(getToken(mensagem, 22, 23, token), baralho);
+	carta[1] = getValor(getToken(mensagem, 24, 25, token), baralho); 
+	carta[2] = getValor(getToken(mensagem, 26, 27, token), baralho); 
+	carta[3] = getValor(getToken(mensagem, 28, 29, token), baralho); 
+
+	int idMaior, maior = carta[0];
+
+	for(i = 0; i < 4; i++){
+		if(carta[i] > maior){
+			maior = carta[i];
+			idMaior = i;
+		}
+	}
+
+	sleep(2);
+	return idMaior;
+}
+
+int vencRodada(char mensagem[32]){
+/* Retorna o nome da equipe vencedora da rodada */
+}
+
+int vencJogo(char mensagem [32]){
+/* Retorna 1 caso alguma equipe tenha vencido o jogo(atingido 12 pts) */
+
+}
+
+void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char *placarRodada,
+			 char *valorRodada, char *question, char *eqQuestion,
+			 char *respQuestion, char *mesa, char *virada){
+
+	bzero(mensagem, 32);
+ 	strcpy(mensagem, "00");
+	strcat(mensagem, vez);
+	strcat(mensagem, rodada);
+	strcat(mensagem, "000000");
+	strcat(mensagem, placarJogo);
+	strcat(mensagem, placarRodada);
+	strcat(mensagem, valorRodada);
+	strcat(mensagem, question);
+	strcat(mensagem, eqQuestion);
+	strcat(mensagem, respQuestion);
+	strcat(mensagem, mesa);
+	strcat(mensagem, virada);
 }
