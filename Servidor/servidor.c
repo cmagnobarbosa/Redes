@@ -25,7 +25,7 @@ void embaralhar(carta baralho[40]);
 
 void distribuir(carta baralho[40], jogador clientes[4]);
 
-void broadCast(jogador clientes[4], char mensagem[32]);
+void entregar(jogador clientes[4], char mensagem[32]);
 
 int getValor(char *nome, carta baralho[40]);
 
@@ -33,13 +33,17 @@ char* getToken(char mensagem[32], int inicio, int fim, char *token);
 
 void setToken(char mensagem[32], int inicio, int fim, char *token);
 
+int vencTurno(char mensagem[32], carta baralho[40]);
+
 void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char *placarRodada,
 			 char *valorRodada, char *question, char *eqQuestion,
 			 char *respQuestion, char *mesa, char *virada);
 
+void broadCast(char mensagem[32], jogador clientes[4]);
+
 int main(){
 	/* Variaveis para estabelecer a comunicacao */
-	int socket_con = 0, num_porta = 5003, temp = 0;
+	int socket_con = 0, num_porta = 5002, temp = 0;
 	socklen_t cliente_len;
 	struct sockaddr_in endereco_servidor, endereco_cliente;
 
@@ -109,8 +113,8 @@ int main(){
 		distribuir(baralho, clientes);
 
 		bzero(mensagem, 32); //Zera o buffer de mensagens
-		strcpy(mensagem, "000000000000000000000000000000E"); // Mensagem inicial
-		broadCast(clientes, mensagem);
+		strcpy(mensagem, "000000000000000000000000000000\n"); // Mensagem inicial
+		entregar(clientes, mensagem);
 
 		volta = saida;
 
@@ -122,17 +126,35 @@ int main(){
 			strcpy(placarJogo, getToken(mensagem, 10, 13, placarJogo));
 
 			for(j = 0; j < 4; j++){ // Turno: 4 jogadores->(4 jogadas)
-
-				printf("Ate aqui veio de boa, e a mensagem vale: %s\n", mensagem);
-
-				unirMsg(mensagem, "1", rodada, "9999", placarRodada,
+				printf("Vez do jogador id: %d\n", volta);
+				unirMsg(mensagem, "1", rodada, placarJogo, placarRodada,
 			 			valorRodada, "0", "0",
-			 			"0", mesa, "0");
+			 			"0", mesa, "E");
 
 				write(clientes[volta].porta, mensagem, 31); 
 				read(clientes[volta].porta, mensagem, 31);
+				broadCast(mensagem, clientes);
+
+				strcpy(mesa, getToken(mensagem, 22, 29, mesa));
+
+				if(volta == 3)
+					volta = 0;
+				else
+					volta++;
 			}
-			break;
+
+			volta = vencTurno(mensagem, baralho);
+			setToken(mensagem, 22, 29, "00000000");
+			if(volta % 2 == 0){
+				setToken(mensagem, 14+i, 14+i, "a");
+				printf("\nEquipe A venceu o %d turno!\n", i+1);
+			}
+			else{
+				setToken(mensagem, 14+i, 14+i, "b");
+				printf("\nEquipe B venceu o %d turno!\n", i+1);
+			}
+			broadCast(mensagem, clientes);
+
 		}
 
 
@@ -244,7 +266,7 @@ void distribuir(carta baralho[40], jogador clientes[4]){
     }
 }
 
-void broadCast(jogador clientes[4], char mensagem[32]){
+void entregar(jogador clientes[4], char mensagem[32]){
 /* Esta funçaõ realiza o envio de uma mensagem padrao para todos os clientes */
 	
 	int i;
@@ -254,7 +276,7 @@ void broadCast(jogador clientes[4], char mensagem[32]){
 		setToken(mensagem, 1, 1, clientes[i].equipe);
 		setToken(mensagem, 4, 9, clientes[i].mao);
 		write(clientes[i].porta, mensagem, 31);
-		sleep(2);
+		sleep(1);
 	}
 }
 
@@ -266,6 +288,8 @@ int getValor(char *nome, carta baralho[40]){
 		if(strcmp(baralho[i].nome, nome) == 0)
 			return baralho[i].valor;
 	}
+	if(i == 40)
+		return 0;
 }
 
 char* getToken(char mensagem[32], int inicio, int fim, char *token){
@@ -326,7 +350,7 @@ int vencJogo(char mensagem [32]){
 void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char *placarRodada,
 			 char *valorRodada, char *question, char *eqQuestion,
 			 char *respQuestion, char *mesa, char *virada){
-
+/* Esta função reune todas strings em uma unica mensagem */
 	bzero(mensagem, 32);
  	strcpy(mensagem, "00");
 	strcat(mensagem, vez);
@@ -339,5 +363,16 @@ void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char 
 	strcat(mensagem, eqQuestion);
 	strcat(mensagem, respQuestion);
 	strcat(mensagem, mesa);
-	strcat(mensagem, virada);
+	strcat(mensagem, "\n");
+}
+
+void broadCast(char mensagem[32], jogador clientes[4]){
+/* Envia uma mesma mensagem para todos os clientes */
+	int i;
+	
+	setToken(mensagem, 2, 2, "0"); // Indica que não é a vez de ninguem
+	for(i = 0; i < 4; i++){
+		write(clientes[i].porta, mensagem, 31);
+		//sleep(1);
+	}
 }
