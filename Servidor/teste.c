@@ -13,17 +13,21 @@ void unir(char *msg, char *token, char *token2){
 
 int main(){
 
-	char msg[32] = "111111111111111111111";
-	char token[7] = "lucas";
-	char token2[4] = "Alo";
+	// char msg[32] = "111111111111111111111";
+	// char token[7] = "lucas";
+	// char token2[4] = "Alo";
 
-	unir(msg, token, token2);
+	// unir(msg, token, token2);
 
-	printf("Token vale: %s\n", msg );
-
-
+	// printf("Token vale: %s\n", msg );
 
 
+	char str[4];
+	strcpy(str, "lucas");
+
+	if(str[0] == 'l')
+		printf("Funcionou\n");
+	printf("%s\n",str );
 
 	return 0;
 }
