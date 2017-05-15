@@ -155,7 +155,7 @@ class Principal(Gui):
         cont = 0
         for i in cartas:
             cont=cont+1
-            if i is not "00":
+            if not i == "00":
                 i = self.gui.caminho_cartas+i+".png"
                 if cont is 1:
                     self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
