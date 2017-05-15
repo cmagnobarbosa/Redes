@@ -131,8 +131,8 @@ class Gui():
             if i is None:
                 cont = cont + 1
         if cont >= 3:
-            print("Fim de Jogo")
-            conexao.envia_mensagem("Fim")
+            print("Fim de rodada")
+            #conexao.envia_mensagem("Fim")
             conexao.encerra_conexao()
 
     def renderiza_cartas_jogadas(self, carta_jogada, posicao):

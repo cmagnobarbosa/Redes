@@ -41,7 +41,7 @@ class Conexao:
         """Realiza a leitura do socket e retorna os dados que foram lidos."""
         retorno = None
         retorno = self.socket.recv(32)
-        if retorno is not None and len(retorno) > 0:
+        if (retorno is not None) and len(retorno) > 0:
             # print"Retorno ", retorno
 
             return retorno

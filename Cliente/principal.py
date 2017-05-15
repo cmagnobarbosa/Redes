@@ -96,7 +96,7 @@ class Principal(Gui):
 
         """
 
-        self.conexao.envia_mensagem("0")
+        #self.conexao.envia_mensagem("0")
         self.mensagem_servidor = self.conexao.ler_socket()
         print "Me", self.mensagem_servidor
         #--Extrai os dados iniciais...
@@ -104,6 +104,7 @@ class Principal(Gui):
         self.jogador.equipe = self.mensagem_servidor[1:2]
         self.sua_vez = int(self.mensagem_servidor[2:3])
         cartas = self.mensagem_servidor[4:10]
+        print "ID ",self.jogador.id,"Equipe ",self.jogador.equipe,"Sua Vez ",self.sua_vez
         self.jogador.cartas_mao = cartas
 
         cartas = self.agrupa_cartas(cartas)
@@ -116,32 +117,34 @@ class Principal(Gui):
         """Verifica a conexao.."""
         while (True):
             palavra = conexao.ler_socket()
-            self.quee.put(palavra)
+            if(palavra is not None):
+                self.quee.put(palavra)
 
     def processa_resposta(self, lista):
         """Vai processar a mensagem recebida"""
-        print "resposta vinda do servidor ", lista
-        self.sua_vez = int(lista[2:3])
-        self.atualiza_mensagem()
-        self.rodada = int(lista[3:4])
-        cartas = lista[4:10]
-        if(cartas != "000000"):
-            # Considerando que nos decorrer das partida o servidor não envia as
-            # cartas. Redefine a mão do jogador.
-            self.jogador.cartas_mao = cartas
-            cartas = self.agrupa_cartas(cartas)
-            for i in cartas:
-                self.gui.cartas_recebidas.append(i)
-        self.gui.pontos = lista[10:14]
-        self.gui.partidas = lista[14:17]
-        self.gui.valor_rodada = lista[17:19]
-        self.proposta_truco_equipe = lista[20:21]
-        self.mesa_jogo = lista[22:30]
-        self.renderiza_mesa()
+        if( lista is not None):
+            print "resposta vinda do servidor ", lista
+            self.sua_vez = int(lista[2:3])
+            self.atualiza_mensagem()
+            self.rodada = int(lista[3:4])
+            cartas = lista[4:10]
+            if(cartas != "000000"):
+                # Considerando que nos decorrer das partida o servidor não envia as
+                # cartas. Redefine a mão do jogador.
+                self.jogador.cartas_mao = cartas
+                cartas = self.agrupa_cartas(cartas)
+                for i in cartas:
+                    self.gui.cartas_recebidas.append(i)
+            self.gui.pontos = lista[10:14]
+            self.gui.partidas = lista[14:17]
+            self.gui.valor_rodada = lista[17:19]
+            self.proposta_truco_equipe = lista[20:21]
+            self.mesa_jogo = lista[22:30]
+            self.renderiza_mesa()
 
-        print self.sua_vez
-        if(self.cont_cartas>0):
-            self.cont_cartas=self.cont_cartas-1
+            print self.sua_vez
+            if(self.cont_cartas>0):
+                self.cont_cartas=self.cont_cartas-1
 
     def renderiza_mesa(self):
         """Função que renderiza_mesa"""
