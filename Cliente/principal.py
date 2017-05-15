@@ -30,25 +30,50 @@ class Principal(Gui):
     """
 
     def __init__(self):
-        self.mensagem_servidor = "A"
+        self.mensagem_servidor = ""
         self.carta_selecionada = -1
-        self.flag_truco = 0
-        self.rodada = 2
+        self.sua_vez = 0
         self.conexao = Conexao()
         self.conexao.conectar()
         self.gui = Gui()
         self.jogador = Jogador()
         self.recebe_cartas()
         self.gui.carrega_cartas()
-        self.sua_vez = 0
-        self.quee = Queue()
-        self.flag_next = 1
+        #--------------------
+
+        self.rodada = 2
         self.gui.valor_rodada = "0"
+        self.flag_truco = 0
+        self.gui.pontos = "0000"
+        self.gui.partidas = "000"
+        self.proposta_truco_equipe = "0"
+        self.resposta_proposta_truco = "0"
+        self.mesa_jogo = "000000"
+        self.gui.mensagem_vez="Aguarde..."
+        self.cont_cartas= 3
+        #-----------------
+        self.quee = Queue()
 
         self.verifica = Thread(target=self.verifica_resposta_servidor, args=(
             self.quee, self.conexao))
         self.verifica.daemon = True
         self.verifica.start()
+
+
+
+
+    def atualiza_mensagem(self):
+        "Atualiza o campo de mensagens.."
+
+        if(self.sua_vez is 0):
+
+
+            self.gui.mensagem_vez="Aguarde..."
+            self.gui.escrever(self.gui.mensagem_vez,(40,430),(255,0,0))
+        if(self.sua_vez is 1):
+
+            self.gui.mensagem_vez="Pode Jogar..."
+            self.gui.escrever(self.gui.mensagem_vez,(40,430),(0,255,0))
 
     def agrupa_cartas(self, lista):
         """Agrupa as cartas recebidas do servidor"""
@@ -65,22 +90,27 @@ class Principal(Gui):
         return lista
 
     def recebe_cartas(self):
-        """ Possui o socket de conexão como parametro de entrada."""
-        """Carrega as cartas recebidas do servidor"""
+        """
+        Carrega as cartas recebidas do servidor.
+        Extrai os dados iniciais da primeira conexão.
+
+        """
+
         self.conexao.envia_mensagem("0")
         self.mensagem_servidor = self.conexao.ler_socket()
         print "Me", self.mensagem_servidor
         #--Extrai os dados iniciais...
         self.jogador.id = self.mensagem_servidor[0:1]
         self.jogador.equipe = self.mensagem_servidor[1:2]
-        self.sua_vez = self.mensagem_servidor[2:3]
+        self.sua_vez = int(self.mensagem_servidor[2:3])
         cartas = self.mensagem_servidor[4:10]
         self.jogador.cartas_mao = cartas
-        # print "ID",ID,"Equipe ",equipe, "Mão ",mao
 
         cartas = self.agrupa_cartas(cartas)
         for i in cartas:
             self.gui.cartas_recebidas.append(i)
+
+
 
     def verifica_resposta_servidor(self, fila, conexao):
         """Verifica a conexao.."""
@@ -90,22 +120,65 @@ class Principal(Gui):
 
     def processa_resposta(self, lista):
         """Vai processar a mensagem recebida"""
-        #self.mensagem_servidor= lista
-        print "resposta ", lista
-        print lista[2:3]
+        print "resposta vinda do servidor ", lista
         self.sua_vez = int(lista[2:3])
+        self.atualiza_mensagem()
+        self.rodada = int(lista[3:4])
+        cartas = lista[4:10]
+        if(cartas != "000000"):
+            # Considerando que nos decorrer das partida o servidor não envia as
+            # cartas. Redefine a mão do jogador.
+            self.jogador.cartas_mao = cartas
+            cartas = self.agrupa_cartas(cartas)
+            for i in cartas:
+                self.gui.cartas_recebidas.append(i)
+        self.gui.pontos = lista[10:14]
+        self.gui.partidas = lista[14:17]
+        self.gui.valor_rodada = lista[17:19]
+        self.proposta_truco_equipe = lista[20:21]
+        self.mesa_jogo = lista[22:30]
+        self.renderiza_mesa()
+
         print self.sua_vez
+        if(self.cont_cartas>0):
+            self.cont_cartas=self.cont_cartas-1
+
+    def renderiza_mesa(self):
+        """Função que renderiza_mesa"""
+        #00 00 00 00
+        self.gui.caminho_cartas
+        cartas = self.agrupa_cartas(self.mesa_jogo)
+        print "Cartas Mesa ",cartas
+        cont = 0
+        for i in cartas:
+            cont=cont+1
+            if i is not "00":
+                i = self.gui.caminho_cartas+i+".png"
+                if cont is 1:
+                    self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+                    self.gui.update_card_adversario(1,self.cont_cartas)
+                if cont is 2:
+                    self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
+                    self.gui.update_card_adversario(2,self.cont_cartas)
+                if cont is 3:
+                    self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                    self.gui.update_card_adversario(3,self.cont_cartas)
+
+
 
     def prepara_mensagem(self, carta_jogada):
-        """Prepara uma mensagem para o envio"""
+        """Prepara uma mensagem da carta jogada para o envio"""
         print "Mensagem ", self.mensagem_servidor
+
         # acerta o id
         self.mensagem_servidor = self.mensagem_servidor[
             :0] + self.jogador.id + self.mensagem_servidor[1:]
+
         # Acerta a equipe
         self.mensagem_servidor = self.mensagem_servidor[
             :1] + self.jogador.equipe + self.mensagem_servidor[2:]
-        # Acera a posicao da carta na mesa
+
+        # Acerta a posicao da carta na mesa
         if(int(self.jogador.id) is 0):
             self.mensagem_servidor = self.mensagem_servidor[
                 :22] + carta_jogada + self.mensagem_servidor[24:]
@@ -120,7 +193,7 @@ class Principal(Gui):
                 :28] + carta_jogada + self.mensagem_servidor[30:]
 
     def envia_carta_servidor(self, carta_jogada):
-        """Dispara cartas para o servidor"""
+        """Dispara cartas para o servidor e altera os campos necessarios.."""
         print "Self Mensagem", self.mensagem_servidor
         if carta_jogada is not None:
             carta_jogada = carta_jogada.split("/")[1].split(".")[0]
@@ -150,13 +223,14 @@ class Principal(Gui):
             for event in pygame.event.get():
                 self.gui.mostra_pontuacao()
                 self.gui.rodadas()
+                self.atualiza_mensagem()
                 if event.type == QUIT:
                     print "Encerrando conexão...."
                     pygame.quit()
                     sys.exit()
                     self.verifica.exit()
                     self.quee.join()
-                if event.type == KEYDOWN and self.flag_truco == 0 and self.sua_vez == 0:
+                if event.type == KEYDOWN and self.flag_truco == 0 and self.sua_vez == 1:
                     op = event.unicode
                     print op
                     op = str(op)
@@ -195,25 +269,28 @@ class Principal(Gui):
                             # Update a carta do adversario para teste
                             # Atualiza as cartas em miniatura
                             #---------------------------------------
-                            self.gui.update_card_adversario(1, 1)
+
+                            #self.gui.update_card_adversario(1, 1)
                             #self.gui.update_card_adversario(2, 1)
                             #self.gui.update_card_adversario(3, 1)
 
                             #---------------------------------------
                             # Renderiza as cartas que foram jogadas
                             #---------------------------------------
-                            self.gui.renderiza_cartas_jogadas(
-                                self.gui.mao[self.carta_selecionada], self.gui.pos_cartas_jog_1)
+
+                            # self.gui.renderiza_cartas_jogadas(
+                            #     self.gui.mao[self.carta_selecionada], self.gui.pos_cartas_jog_1)
                             # self.gui.renderiza_cartas_jogadas(
                             #     self.gui.mao[self.carta_selecionada], self.gui.pos_cartas_jog_2)
                             # self.gui.renderiza_cartas_jogadas(
                             #     self.gui.mao[self.carta_selecionada], self.gui.pos_cartas_jog_3)
+
                             #--------------------------------------
                             if self.carta_selecionada is not 3:
                                 self.gui.mao[self.carta_selecionada] = None
                             self.gui.verifica_mao(self.gui.mao, self.conexao)
                             # self.gui.pause()
-                if event.type == MOUSEBUTTONDOWN and select == 0 and self.sua_vez == 0:
+                if event.type == MOUSEBUTTONDOWN and select == 0:
                     """Define a mudança da tela"""
                     print event.button, event.pos
                     fundo = pygame.image.load(
@@ -226,16 +303,19 @@ class Principal(Gui):
 
                     self.gui.update_card_adversario(0, 3)
                     self.gui.escrever(
-                        "Para selecionar cartas escolha [1,2,3]", (30, 30))
+                        "Para selecionar cartas escolha [1,2,3]", (30, 30),
+                        self.gui.branco)
                     self.gui.escrever(
-                        "Para Jogar a carta utilize seta para frente", (30, 50))
+                        "Para Jogar a carta utilize seta para frente", (30, 50),
+                        self.gui.branco)
                     self.gui.escrever(
-                        "Utilize as setas direcionais para ocultar", (30, 70))
+                        "Utilize as setas direcionais para ocultar", (30, 70),
+                         self.gui.branco)
                     select = 1
-                if event.type == MOUSEBUTTONDOWN and self.sua_vez == 0:
+                if event.type == MOUSEBUTTONDOWN and self.sua_vez == 1:
                     pos = event.pos
                     print "Posicao ", pos
-                    if (pos[0] > 700 and pos[0] < 750):
+                    if (pos[0] > 670 and pos[0] < 780):
                         if(pos[1] > 471 and pos[1] < 471 + 20):
                             self.gui.desenha_botao_truco("Seis")
                             self.gui.tela_truco()
@@ -254,14 +334,17 @@ class Principal(Gui):
                             self.flag_truco = 0
                             # self.cartas_jogadas()
 
-            # update_card(tela,None)
             pygame.display.update()
-            # self.gui.valor_rodada="6"
+
             for i in range(0, 1):
                 # Percorre a fila lendo as mensagens recebidas do servidor
                 if not self.quee.empty():
                     retorno = self.quee.get(i)
                     self.processa_resposta(retorno)
+                    # Adiciona um evento na pilha de eventos para atualizar a
+                    # tela.
+                    evento = pygame.event.Event(USEREVENT)
+                    pygame.event.post(evento)
 
 
 if __name__ == '__main__':

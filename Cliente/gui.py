@@ -31,6 +31,7 @@ class Gui():
 
         self.caminho_cartas = "cartas/"
         self.caminho_background = "background/"
+        self.branco = (255, 255, 255)
         #-----------------------------------------
         self.pos_cartas_jog = (400, 400, 66, 90)
         self.sua_pos_carta = (400, 270, 66, 90)
@@ -44,11 +45,9 @@ class Gui():
         self.mao = []
         #-----------------------
         self.valor_rodada = "0"
-        self.ponto = "0"
-        self.ponto_ad = "0"
-        self.p_1 = " V "
-        self.p_2 = " X "
-        self.p_3 = " - "
+        self.pontos = "0000"
+        self.partidas="000"
+        self.mensagem_vez="Aguarde..."
         #---------------------
 
         self.tela = pygame.display.set_mode((500, 400), 0, 32)
@@ -60,27 +59,28 @@ class Gui():
 
     def desenha_botao_truco(self, texto):
         """Desenha o Botão de truco"""
-        pygame.draw.rect(self.tela, (192, 192, 192), (670, 471, 50, 20))
-        self.escrever(texto, (670, 471))
+        pygame.draw.rect(self.tela, (192, 192, 192), (670, 471, 110, 20))
+        self.escrever(texto, (670, 471),self.branco)
 
     def mostra_pontuacao(self):
         """ Renderiza a Pontuação."""
-        ponto = 0
-        ponto_ad = 0
+        #Quadrado do valor da rodada
         pygame.draw.rect(self.tela, (0, 0, 0), (670, 450, 110, 20))
-        pygame.draw.rect(self.tela, (0, 0, 0), (40, 450, 130, 20))
-        self.escrever("Valor Rod: " + self.valor_rodada, (670, 450))
-        self.escrever("Nós: " + self.ponto + " Eles: " +
-                      self.ponto_ad, (40, 450))
+
+        pygame.draw.rect(self.tela, (0, 0, 0), (29, 450, 145, 20))
+
+        pygame.draw.rect(self.tela,(0, 0, 0),(29,430,145,20))
+        self.escrever(self.mensagem_vez,(40,430),(255,0,0))
+        self.escrever("Valor Rod: " + self.valor_rodada, (670, 450), self.branco)
+        self.escrever("Nós: " + self.pontos[0:2] + " Eles: " +
+                      self.pontos[2:4], (40, 450), self.branco)
 
     def rodadas(self):
         """"Desenha um bloco"""
-        self.p_1 = " A "
-        self.p_2 = " B "
-        self.p_3 = " A "
-        card = pygame.draw.rect(self.tela, (0, 0, 0), (29, 471, 140, 30))
-        self.escrever("[" + self.p_1 + "] | [" + self.p_2 +
-                      "] | [" + self.p_3 + "]", (40, 471))
+
+        card = pygame.draw.rect(self.tela, (0, 0, 0), (29, 471, 145, 30))
+        self.escrever("[" + self.partidas[0:1] + "] | [" + self.partidas[1:2] +
+                      "] | [" + self.partidas[2:3] + "]", (40, 471),self.branco)
         pygame.display.update()
 
     def carrega_cartas(self):
@@ -88,7 +88,7 @@ class Gui():
         for i in range(0, 3):
             self.mao.append(self.caminho_cartas +
                             self.cartas_recebidas[i] + ".png")
-        self.mao.append(self.caminho_cartas + "verso/vv.png")
+        self.mao.append(self.caminho_cartas + "vv.png")
 
     def update_card(self, card, posicao):
         """Atualiza o desenho das cartas"""
@@ -111,7 +111,7 @@ class Gui():
                 carta = self.caminho_cartas + "/miniatura/1_card.png"
             card = pygame.image.load(carta)
 
-            if jogador is 1 or jogador is 0:
+            if jogador is 3 or jogador is 0:
                 self.tela.blit(card, (4, 212, 54, 43))
 
             if jogador == 2 or jogador is 0:
@@ -119,7 +119,7 @@ class Gui():
                 card = pygame.transform.rotate(card, -90)
                 self.tela.blit(card, (400, 2, 54, 43))
 
-            if jogador == 3 or jogador is 0:
+            if jogador == 1 or jogador is 0:
                 card = pygame.image.load(carta)
                 card = pygame.transform.rotate(card, 180)
                 self.tela.blit(card, (750, 212, 54, 43))
@@ -161,11 +161,11 @@ class Gui():
         "Largura x Altura"
         self.tela = pygame.display.set_mode((800, 500), 0, 32)
 
-    def escrever(self, texto, posicao):
+    def escrever(self, texto, posicao , cor ):
         """Formato posicao (horizontal,vertical)"""
         texto_c = unicode(texto, "utf-8")
         myfont = pygame.font.SysFont("arial", 18)
-        label = myfont.render(texto_c, 1, (255, 255, 255))
+        label = myfont.render(texto_c, 1, cor)
         #(X,y)
         self.tela.blit(label, posicao)
 
@@ -177,11 +177,11 @@ class Gui():
         self.desenha_botao_truco("Truco")
         self.update_card_adversario(0, 3)
         self.escrever(
-            "Para selecionar cartas escolha [1,2,3]", (30, 30))
+            "Para selecionar cartas escolha [1,2,3]", (30, 30),self.branco)
         self.escrever(
-            "Para Jogar a carta utilize seta para frente", (30, 50))
+            "Para Jogar a carta utilize seta para frente", (30, 50),self.branco)
         self.escrever(
-            "Utilize as setas direcionais para ocultar", (30, 70))
+            "Utilize as setas direcionais para ocultar", (30, 70),self.branco)
         # self.tela.blit(truco,(200,170,450,100))
 
     def tela_truco(self):

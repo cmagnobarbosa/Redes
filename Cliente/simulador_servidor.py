@@ -2,6 +2,10 @@
 """
 Este modulo vai simular a comunicação com servidor..
 Modulo simula a iteração do servidor
+
+Padrão da mensagem
+"0 0 1 2 000000 0201 ab0 03 0 0 0 2e4p5o6c 0"
+sem os espaços...
 """
 import socket
 import time
@@ -33,7 +37,7 @@ while(True):
 
     msg = con.recv(1024)
     print "enviado"
-    con.send('1a004p7c7o000000000000000000000')
+    con.send('1a104p7c7o000000000000000000000')
     msg = ""
 
     while(True):
@@ -41,7 +45,10 @@ while(True):
         if len(msg) > 0:
             print msg
             time.sleep(5)
-            con.send("00014p7c7o000000000000000000000")
+            #0012 000000 0201 ab0 03 0 0 0 2e4p5o6c 0"
+            con.send("00020000000201ab0030002e4p5o6c0")
+            time.sleep(5)
+            con.send("00120000000201ab0030002e4p5o6c0")
         if msg == "Fim":
             """Encerra a conexao e fecha o cliente"""
             print "Fim de Jogo", 'Finalizando conexao do cliente', cliente
