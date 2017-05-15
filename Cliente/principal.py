@@ -41,7 +41,7 @@ class Principal(Gui):
         self.gui.carrega_cartas()
         #--------------------
 
-        self.rodada = 2
+        self.rodada = 1
         self.gui.valor_rodada = "0"
         self.flag_truco = 0
         self.gui.pontos = "0000"
@@ -98,7 +98,7 @@ class Principal(Gui):
 
         #self.conexao.envia_mensagem("0")
         self.mensagem_servidor = self.conexao.ler_socket()
-        print "Me", self.mensagem_servidor
+        #print "Me", self.mensagem_servidor
         #--Extrai os dados iniciais...
         self.jogador.id = self.mensagem_servidor[0:1]
         self.jogador.equipe = self.mensagem_servidor[1:2]
@@ -122,10 +122,12 @@ class Principal(Gui):
 
     def processa_resposta(self, lista):
         """Vai processar a mensagem recebida"""
+        self.mensagem_servidor=lista
         if( lista is not None):
             print "resposta vinda do servidor ", lista
             self.sua_vez = int(lista[2:3])
             self.atualiza_mensagem()
+            self.finaliza_rodada(int(lista[3:4]))
             self.rodada = int(lista[3:4])
             cartas = lista[4:10]
             if(cartas != "000000"):
@@ -152,34 +154,55 @@ class Principal(Gui):
         self.gui.caminho_cartas
         cartas = self.agrupa_cartas(self.mesa_jogo)
         print "Cartas Mesa ",cartas
-        cont = 0
+        cont = -1
         for i in cartas:
             cont=cont+1
+            #self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+            #self.gui.update_card_adversario(1,self.cont_cartas)
             if not i == "00":
                 i = self.gui.caminho_cartas+i+".png"
-                if cont is 1:
-                    self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
-                    self.gui.update_card_adversario(1,self.cont_cartas)
-                if cont is 2:
-                    self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
-                    self.gui.update_card_adversario(2,self.cont_cartas)
-                if cont is 3:
-                    self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
-                    self.gui.update_card_adversario(3,self.cont_cartas)
+                if(self.jogador.id == "0"):
+                    if cont is 0:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.sua_pos_carta)
+                    if cont is 1:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+                    if cont is 2:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
+                    if cont is 3:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                if(self.jogador.id== "1"):
+                    if cont is 0:
+                        #print "passou"
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+                    if cont is 1:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
+                    if cont is 2:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                    if cont is 3:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.sua_pos_carta)
 
+
+
+    def finaliza_rodada(self, valor):
+        """Verifica se a rodada terminou e limpa a tela"""
+        if(int(self.rodada) is not valor):
+            self.gui.tela_padrao()
+            print "Limpando a rodada"
 
 
     def prepara_mensagem(self, carta_jogada):
         """Prepara uma mensagem da carta jogada para o envio"""
         print "Mensagem ", self.mensagem_servidor
-
         # acerta o id
         self.mensagem_servidor = self.mensagem_servidor[
-            :0] + self.jogador.id + self.mensagem_servidor[1:]
+            :0] + "0" + self.mensagem_servidor[1:]
 
         # Acerta a equipe
         self.mensagem_servidor = self.mensagem_servidor[
-            :1] + self.jogador.equipe + self.mensagem_servidor[2:]
+            :1] + "0" + self.mensagem_servidor[2:]
+        #Limpa mao..
+        self.mensagem_servidor = self.mensagem_servidor[
+            :4] + "000000" + self.mensagem_servidor[10:]
 
         # Acerta a posicao da carta na mesa
         if(int(self.jogador.id) is 0):
@@ -264,8 +287,8 @@ class Principal(Gui):
                     if op == "273":
                         print "carta jogada", self.gui.mao[self.carta_selecionada]
                         if (self.carta_selecionada != -1):
-                            self.gui.jogar_carta(
-                                self.gui.mao[self.carta_selecionada], self.conexao)
+                            # self.gui.jogar_carta(
+                            #     self.gui.mao[self.carta_selecionada], self.conexao)
                             self.sua_vez = 1  # Bloqueia a mão ..
                             self.envia_carta_servidor(
                                 self.gui.mao[self.carta_selecionada])

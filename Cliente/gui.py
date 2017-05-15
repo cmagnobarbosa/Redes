@@ -133,7 +133,7 @@ class Gui():
         if cont >= 3:
             print("Fim de rodada")
             #conexao.envia_mensagem("Fim")
-            conexao.encerra_conexao()
+            #conexao.encerra_conexao()
 
     def renderiza_cartas_jogadas(self, carta_jogada, posicao):
         """Renderiza a carta jogada"""
