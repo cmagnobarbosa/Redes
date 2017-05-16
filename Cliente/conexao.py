@@ -21,7 +21,7 @@ class Conexao:
     """Modulo de conexão com servidor"""
 
     def __init__(self):
-        self.servidor_end = '192.168.43.240'     # Endereco IP do Servidor
+        self.servidor_end = '172.16.255.15'     # Endereco IP do Servidor
         self.porta = self.ler_config()
         self.socket = ""                           # Porta que o Servidor esta
         # self.socket_conexao = None                #Socket de conexao.
