@@ -287,13 +287,13 @@ class Principal(Gui):
 
     def verifica_proposta_truco(self):
         """Exibe a tela de Truco"""
-        if(self.question_truco == "1") and self.sua_vez == "1":
+        if(self.question_truco == "1") and self.sua_vez is 1:
             self.gui.tela_truco()
 
     def solicita_truco(self):
         """Solicitar Truco"""
 
-        if(self.sua_vez == "1"):
+        if(self.sua_vez is 1):
             print "Solicitando Truco.."
             self.mensagem_servidor = self.mensagem_servidor[
                 :19] + self.question_truco + self.mensagem_servidor[20:]
@@ -429,7 +429,7 @@ class Principal(Gui):
                             if (self.truco_habilitado is 1):
                                 print "entrouuu"
                                 print "Variaveis do truco Sua Vez ", self.sua_vez, type(self.sua_vez), "Minha equipe ", self.jogador.equipe, type(self.jogador.equipe), "Proposta truco equipe ", self.proposta_truco_equipe, type(self.proposta_truco_equipe)
-                                if(self.sua_vez == "1" and (self.jogador.equipe == self.proposta_truco_equipe or self.proposta_truco_equipe == "0")):
+                                if(self.sua_vez is 1 and (self.jogador.equipe == self.proposta_truco_equipe or self.proposta_truco_equipe == "0")):
                                     print "pedindo truco"
                                     self.question_truco = "1"
                                     self.solicita_truco()
