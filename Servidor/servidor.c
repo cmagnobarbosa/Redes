@@ -362,7 +362,7 @@ void embaralhar(carta baralho[40]){
 
 void distribuir(carta baralho[40], jogador clientes[4]){
 /* Esta função distribui as cartas aleatoriamenteentre os jogadores */
-	int i,j,k = 0;
+	int i = 0, j = 0, k = 0;
 	int card[12];
     srand(time(NULL));
 
