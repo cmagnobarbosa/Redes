@@ -135,9 +135,9 @@ int main(){
 		flag = 0;
 		volta = saida;
 		if(maoDe11(placarJogo)) // Se estiver na mao de 11 a rodada vale 3
-			strcpy(valorRodada, "44");
+			strcpy(valorRodada, "03");
 		else
-			strcpy(valorRodada, "11");
+			strcpy(valorRodada, "01");
 
 		for(i = 0; i < 3; i++){    // Rodada: 3 turnos
 			rodada[0] = i + 49;
