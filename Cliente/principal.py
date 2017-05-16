@@ -30,6 +30,11 @@ class Principal(Gui):
     """
 
     def __init__(self):
+        #---HABILITAR BOTAO TRUCO---
+        #Ative para ativar a opção de pedir truco..
+        self.truco_habilitado = 0
+        #--------------------
+
         self.mensagem_servidor = ""
         self.carta_selecionada = -1
         self.sua_vez = 0
@@ -46,11 +51,12 @@ class Principal(Gui):
         self.flag_truco = 0
         self.gui.pontos = "0000"
         self.gui.partidas = "000"
+        self.question_truco="0"
         self.proposta_truco_equipe = "0"
         self.resposta_proposta_truco = "0"
         self.mesa_jogo = "000000"
         self.gui.mensagem_vez="Aguarde..."
-        self.cont_cartas= 3
+        self.gui.cont_cartas= 3
         #-----------------
         self.quee = Queue()
 
@@ -72,7 +78,7 @@ class Principal(Gui):
             self.gui.escrever(self.gui.mensagem_vez,(40,430),(255,0,0))
         if(self.sua_vez is 1):
 
-            self.gui.mensagem_vez="Pode Jogar..."
+            self.gui.mensagem_vez="Sua Vez..."
             self.gui.escrever(self.gui.mensagem_vez,(40,430),(0,255,0))
 
     def agrupa_cartas(self, lista):
@@ -140,13 +146,14 @@ class Principal(Gui):
             self.gui.pontos = lista[10:14]
             self.gui.partidas = lista[14:17]
             self.gui.valor_rodada = lista[17:19]
+            self.question_truco= lista[19:20]
             self.proposta_truco_equipe = lista[20:21]
             self.mesa_jogo = lista[22:30]
             self.renderiza_mesa()
 
             print self.sua_vez
-            if(self.cont_cartas>0):
-                self.cont_cartas=self.cont_cartas-1
+            if(self.gui.cont_cartas>1):
+                self.gui.cont_cartas=self.gui.cont_cartas-1
 
     def renderiza_mesa(self):
         """Função que renderiza_mesa"""
@@ -161,32 +168,73 @@ class Principal(Gui):
             #self.gui.update_card_adversario(1,self.cont_cartas)
             if not i == "00":
                 i = self.gui.caminho_cartas+i+".png"
+
                 if(self.jogador.id == "0"):
                     if cont is 0:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.sua_pos_carta)
+
                     if cont is 1:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+                        self.gui.update_card_adversario(1,self.gui.cont_cartas)
                     if cont is 2:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
+                        self.gui.update_card_adversario(2,self.gui.cont_cartas)
                     if cont is 3:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
-                if(self.jogador.id== "1"):
+                        self.gui.update_card_adversario(3,self.gui.cont_cartas)
+
+                elif(self.jogador.id == "1"):
                     if cont is 0:
-                        #print "passou"
                         self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
-                    if cont is 1:
-                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
-                    if cont is 2:
-                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
-                    if cont is 3:
+                        self.gui.update_card_adversario(1,self.gui.cont_cartas)
+                    elif cont is 1:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.sua_pos_carta)
+
+                    elif cont is 2:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
+                        self.gui.update_card_adversario(2,self.gui.cont_cartas)
+
+                    elif cont is 3:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                        self.gui.update_card_adversario(3,self.gui.cont_cartas)
+
+                elif(self.jogador.id == "2"):
+                    if cont is 0:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+                        self.gui.update_card_adversario(1,self.gui.cont_cartas)
+                    elif cont is 1:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
+                        self.gui.update_card_adversario(2,self.gui.cont_cartas)
+                    elif cont is 2:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.sua_pos_carta)
+
+                    elif cont is 3:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                        self.gui.update_card_adversario(3,self.gui.cont_cartas)
+
+                elif (self.jogador.id == "3"):
+                    if cont is 0:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+                        self.gui.update_card_adversario(1,self.gui.cont_cartas)
+                    elif cont is 1:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
+                        self.gui.update_card_adversario(2,self.gui.cont_cartas)
+
+                    elif cont is 2:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                        self.gui.update_card_adversario(3,self.gui.cont_cartas)
+
+                    elif cont is 3:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.sua_pos_carta)
+
+
 
 
 
     def finaliza_rodada(self, valor):
         """Verifica se a rodada terminou e limpa a tela"""
         if(int(self.rodada) is not valor):
-            self.gui.tela_padrao()
+            self.gui.tela_padrao(self.jogador.equipe)
             print "Limpando a rodada"
 
 
@@ -218,9 +266,33 @@ class Principal(Gui):
             self.mensagem_servidor = self.mensagem_servidor[
                 :28] + carta_jogada + self.mensagem_servidor[30:]
 
+    def verifica_proposta_truco(self):
+        """Exibe a tela de Truco"""
+        if(self.question_truco == "1") and self.sua_vez == "1":
+            self.gui.tela_truco()
+
+    def solicita_truco(self):
+        """Solicitar Truco"""
+
+        if(self.sua_vez == "1"):
+            print "Solicitando Truco.."
+            self.mensagem_servidor = self.mensagem_servidor[
+                :19] + self.question_truco + self.mensagem_servidor[20:]
+            print "Mensagem enviada na solicitação de Truco..",self.mensagem_servidor
+
+    def responde_truco(self):
+        """Envia uma mensagem para o servidor com a resposta do truco"""
+
+        self.mensagem_servidor = self.mensagem_servidor[
+            :21] + self.resposta_proposta_truco + self.mensagem_servidor[22:]
+
+        print "Enviando a Seguinte resposta de Truco ",self.mensagem_servidor
+        self.conexao.envia_mensagem(self.mensagem_servidor)
+
+
+
     def envia_carta_servidor(self, carta_jogada):
         """Dispara cartas para o servidor e altera os campos necessarios.."""
-        print "Self Mensagem", self.mensagem_servidor
         if carta_jogada is not None:
             carta_jogada = carta_jogada.split("/")[1].split(".")[0]
             # 1(ID)|a(Equipe)|0(vez)|0(rodada)|4p7c7o(mao)|0000(placar_jogo)|000(placar_rodada)|00(valor
@@ -247,9 +319,10 @@ class Principal(Gui):
         while True:
 
             for event in pygame.event.get():
-                self.gui.mostra_pontuacao()
-                self.gui.rodadas()
+                self.gui.mostra_pontuacao(self.jogador.equipe)
+                self.gui.rodadas(self.jogador.equipe)
                 self.atualiza_mensagem()
+                self.gui.desenha_botao_truco(self.gui.valor_rodada,self.proposta_truco_equipe)
                 if event.type == QUIT:
                     print "Encerrando conexão...."
                     pygame.quit()
@@ -300,18 +373,6 @@ class Principal(Gui):
                             #self.gui.update_card_adversario(2, 1)
                             #self.gui.update_card_adversario(3, 1)
 
-                            #---------------------------------------
-                            # Renderiza as cartas que foram jogadas
-                            #---------------------------------------
-
-                            # self.gui.renderiza_cartas_jogadas(
-                            #     self.gui.mao[self.carta_selecionada], self.gui.pos_cartas_jog_1)
-                            # self.gui.renderiza_cartas_jogadas(
-                            #     self.gui.mao[self.carta_selecionada], self.gui.pos_cartas_jog_2)
-                            # self.gui.renderiza_cartas_jogadas(
-                            #     self.gui.mao[self.carta_selecionada], self.gui.pos_cartas_jog_3)
-
-                            #--------------------------------------
                             if self.carta_selecionada is not 3:
                                 self.gui.mao[self.carta_selecionada] = None
                             self.gui.verifica_mao(self.gui.mao, self.conexao)
@@ -325,7 +386,7 @@ class Principal(Gui):
                     self.gui.tela.blit(fundo, [0, 0])
                     # self.gui.rodadas()
                     # self.gui.mostra_pontuacao()
-                    self.gui.desenha_botao_truco("Truco")
+                    #self.gui.desenha_botao_truco(self.gui.valor_rodada)
 
                     self.gui.update_card_adversario(0, 3)
                     self.gui.escrever(
@@ -343,20 +404,28 @@ class Principal(Gui):
                     print "Posicao ", pos
                     if (pos[0] > 670 and pos[0] < 780):
                         if(pos[1] > 471 and pos[1] < 471 + 20):
-                            self.gui.desenha_botao_truco("Seis")
-                            self.gui.tela_truco()
-                            self.flag_truco = 1
+                            #self.gui.desenha_botao_truco(self.gui.valor_rodada)
+                            if (self.truco_habilitado is 1):
+                                if(self.gui.valor_rodada !="12"):
+                                    self.question_truco="1"
+                                    self.solicita_truco()
+                                    self.flag_truco = 1
+                                else:
+                                    print "Não é permitido pedir truco na mão de 12"
+                            else:
+                                print "A opção de truco não está Habilitada."
                     if (pos[0] > 363 and pos[0] < 392) and self.flag_truco is 1:
                         if (pos[1] > 236 and pos[1] < 276):
                             print "Truco Aceito"
-                            self.gui.tela_padrao()
-                            # self.main()
+                            self.resposta_proposta_truco= "1"
+                            self.responde_truco()
+                            self.gui.tela_padrao(self.jogador.equipe)
                             self.flag_truco = 0
-                            # self.cartas_jogadas()
+
                     if (pos[0] > 410 and pos[0] < 441) and self.flag_truco is 1:
                         if (pos[1] > 237 and pos[1] < 266):
                             print "Truco Não Foi aceito"
-                            self.gui.tela_padrao()
+                            self.gui.tela_padrao(self.jogador.equipe)
                             self.flag_truco = 0
                             # self.cartas_jogadas()
 

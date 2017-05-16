@@ -43,6 +43,7 @@ class Gui():
         self.lista_cards = []
         self.cartas_recebidas = []
         self.mao = []
+        self.cont_cartas= 3
         #-----------------------
         self.valor_rodada = "0"
         self.pontos = "0000"
@@ -57,12 +58,35 @@ class Gui():
     def atualiza_pontuacao(self, ponto):
         self.valor_rodada = ponto
 
-    def desenha_botao_truco(self, texto):
+    def desenha_botao_truco(self,v_rodada,equipe):
         """Desenha o Botão de truco"""
+        texto=" "
+        if equipe == "0":
+            if(v_rodada == "1"):
+                texto = "Truco"
+        elif equipe == "a":
+            if(v_rodada == "3"):
+                texto="Seis"
+            elif(v_rodada == "6"):
+                texto="Nove"
+            elif(v_rodada =="9"):
+                texto="Doze"
+            elif(v_rodada=="12"):
+                texto=" "
+        elif equipe == "b":
+            if(v_rodada == "3"):
+                texto="Seis"
+            elif(v_rodada == "6"):
+                texto="Nove"
+            elif(v_rodada =="9"):
+                texto="Doze"
+            elif(v_rodada=="12"):
+                texto=" "
+
         pygame.draw.rect(self.tela, (192, 192, 192), (670, 471, 110, 20))
         self.escrever(texto, (670, 471),self.branco)
 
-    def mostra_pontuacao(self):
+    def mostra_pontuacao(self,equipe):
         """ Renderiza a Pontuação."""
         #Quadrado do valor da rodada
         pygame.draw.rect(self.tela, (0, 0, 0), (670, 450, 110, 20))
@@ -71,11 +95,16 @@ class Gui():
 
         pygame.draw.rect(self.tela,(0, 0, 0),(29,430,145,20))
         self.escrever(self.mensagem_vez,(40,430),(255,0,0))
-        self.escrever("Valor Rod: " + self.valor_rodada, (670, 450), self.branco)
-        self.escrever("Nós: " + self.pontos[0:2] + " Eles: " +
-                      self.pontos[2:4], (40, 450), self.branco)
+        self.escrever("Sua Equipe: " + equipe, (670, 450), self.branco)
+        if(equipe=="a"):
+            self.escrever("Nós: " + self.pontos[0:2] + " Eles: " +
+                          self.pontos[2:4], (40, 450), self.branco)
+        else:
+            self.escrever("Nós: " + self.pontos[2:4] + " Eles: " +
+                          self.pontos[0:2], (40, 450), self.branco)
 
-    def rodadas(self):
+
+    def rodadas(self,equipe):
         """"Desenha um bloco"""
 
         card = pygame.draw.rect(self.tela, (0, 0, 0), (29, 471, 145, 30))
@@ -169,13 +198,13 @@ class Gui():
         #(X,y)
         self.tela.blit(label, posicao)
 
-    def tela_padrao(self):
+    def tela_padrao(self,equipe):
         fundo = pygame.image.load("background/fundo.jpg")
         self.tela.blit(fundo, [0, 0])
-        self.rodadas()
-        self.mostra_pontuacao()
-        self.desenha_botao_truco("Truco")
-        self.update_card_adversario(0, 3)
+        self.rodadas(equipe)
+        self.mostra_pontuacao(equipe)
+        #self.desenha_botao_truco("Truco")
+        self.update_card_adversario(0,self.cont_cartas)
         self.escrever(
             "Para selecionar cartas escolha [1,2,3]", (30, 30),self.branco)
         self.escrever(
