@@ -32,7 +32,7 @@ class Principal(Gui):
     def __init__(self):
         #---HABILITAR BOTAO TRUCO---
         #Ative para ativar a opção de pedir truco..
-        self.truco_habilitado = 1
+        self.truco_habilitado = 0
         #--------------------
 
         self.mensagem_servidor = ""
@@ -159,6 +159,7 @@ class Principal(Gui):
         """Função que renderiza_mesa"""
         #00 00 00 00
         self.gui.caminho_cartas
+        print self.mensagem_servidor
         cartas = self.agrupa_cartas(self.mesa_jogo)
         print "Cartas Mesa ",cartas
         cont = -1
