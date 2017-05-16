@@ -298,7 +298,7 @@ class Principal(Gui):
             self.mensagem_servidor = self.mensagem_servidor[
                 :19] + self.pede_truco + self.mensagem_servidor[20:]
             print "Mensagem enviada na solicitação de Truco..", self.mensagem_servidor
-            self.conexao(self.mensagem_servidor)
+            self.conexao.envia_mensagem(self.mensagem_servidor)
             self.pede_truco ="0"
 
     def responde_truco(self):
