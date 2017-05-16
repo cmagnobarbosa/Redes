@@ -45,7 +45,7 @@ class Principal(Gui):
         self.recebe_cartas()
         self.gui.carrega_cartas()
         #--------------------
-
+        self.pede_truco="0"
         self.rodada = 1
         self.gui.valor_rodada = "0"
         self.flag_truco = 0
@@ -296,8 +296,9 @@ class Principal(Gui):
         if(self.sua_vez is 1):
             print "Solicitando Truco.."
             self.mensagem_servidor = self.mensagem_servidor[
-                :19] + self.question_truco + self.mensagem_servidor[20:]
+                :19] + self.pede_truco + self.mensagem_servidor[20:]
             print "Mensagem enviada na solicitação de Truco..", self.mensagem_servidor
+            self.pede_truco ="0"
 
     def responde_truco(self):
         """Envia uma mensagem para o servidor com a resposta do truco"""
@@ -431,7 +432,7 @@ class Principal(Gui):
                                 print "Variaveis do truco Sua Vez ", self.sua_vez, type(self.sua_vez), "Minha equipe ", self.jogador.equipe, type(self.jogador.equipe), "Proposta truco equipe ", self.proposta_truco_equipe, type(self.proposta_truco_equipe)
                                 if(self.sua_vez is 1 and (self.jogador.equipe == self.proposta_truco_equipe or self.proposta_truco_equipe == "0")):
                                     print "pedindo truco"
-                                    self.question_truco = "1"
+                                    self.pede_truco = "1"
                                     self.solicita_truco()
                                     self.flag_truco = 1
                                 else:
