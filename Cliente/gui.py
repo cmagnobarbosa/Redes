@@ -60,7 +60,7 @@ class Gui():
 
     def desenha_botao_truco(self,v_rodada,equipe):
         """Desenha o Botão de truco"""
-        texto=" "
+        texto="Truco"
         if equipe == "0":
             if(v_rodada == "1"):
                 texto = "Truco"

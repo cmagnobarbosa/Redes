@@ -195,7 +195,7 @@ class Principal(Gui):
                         self.gui.update_card_adversario(1,self.gui.cont_cartas)
 
                     elif cont is 3:
-                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
                         self.gui.update_card_adversario(3,self.gui.cont_cartas)
 
                 elif(self.jogador.id == "2"):
@@ -406,6 +406,7 @@ class Principal(Gui):
                         if(pos[1] > 471 and pos[1] < 471 + 20):
                             #self.gui.desenha_botao_truco(self.gui.valor_rodada)
                             if (self.truco_habilitado is 1):
+                                print "entrouuu"
                                 if(self.gui.valor_rodada !="12"):
                                     self.question_truco="1"
                                     self.solicita_truco()
