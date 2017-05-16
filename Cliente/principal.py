@@ -32,7 +32,7 @@ class Principal(Gui):
     def __init__(self):
         #---HABILITAR BOTAO TRUCO---
         #Ative para ativar a opção de pedir truco..
-        self.truco_habilitado = 0
+        self.truco_habilitado = 1
         #--------------------
 
         self.mensagem_servidor = ""
@@ -185,14 +185,14 @@ class Principal(Gui):
 
                 elif(self.jogador.id == "1"):
                     if cont is 0:
-                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
-                        self.gui.update_card_adversario(1,self.gui.cont_cartas)
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                        self.gui.update_card_adversario(3,self.gui.cont_cartas)
                     elif cont is 1:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.sua_pos_carta)
 
                     elif cont is 2:
-                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
-                        self.gui.update_card_adversario(2,self.gui.cont_cartas)
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+                        self.gui.update_card_adversario(1,self.gui.cont_cartas)
 
                     elif cont is 3:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
@@ -200,17 +200,17 @@ class Principal(Gui):
 
                 elif(self.jogador.id == "2"):
                     if cont is 0:
-                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
-                        self.gui.update_card_adversario(1,self.gui.cont_cartas)
-                    elif cont is 1:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_2)
                         self.gui.update_card_adversario(2,self.gui.cont_cartas)
+                    elif cont is 1:
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
+                        self.gui.update_card_adversario(3,self.gui.cont_cartas)
                     elif cont is 2:
                         self.gui.renderiza_cartas_jogadas(i,self.gui.sua_pos_carta)
 
                     elif cont is 3:
-                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_3)
-                        self.gui.update_card_adversario(3,self.gui.cont_cartas)
+                        self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
+                        self.gui.update_card_adversario(1,self.gui.cont_cartas)
 
                 elif (self.jogador.id == "3"):
                     if cont is 0:
@@ -426,6 +426,8 @@ class Principal(Gui):
                         if (pos[1] > 237 and pos[1] < 266):
                             print "Truco Não Foi aceito"
                             self.gui.tela_padrao(self.jogador.equipe)
+                            self.resposta_proposta_truco= "0"
+                            se.responde_truco()
                             self.flag_truco = 0
                             # self.cartas_jogadas()
 
