@@ -351,7 +351,7 @@ class Principal(Gui):
                     sys.exit()
                     self.verifica.exit()
                     self.quee.join()
-                if event.type == KEYDOWN and self.flag_truco == 0 and self.sua_vez == 1:
+                if event.type == KEYDOWN and self.sua_vez == 1:
                     op = event.unicode
                     print op
                     op = str(op)
@@ -438,6 +438,7 @@ class Principal(Gui):
                                     self.solicita_truco()
                                     self.flag_truco = 1
                                 else:
+                                    print self.gui.mao
                                     print "Não é permitido pedir truco na mão de 12"
                             else:
                                 print "A opção de truco não está Habilitada."
