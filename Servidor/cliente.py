@@ -2,7 +2,7 @@ import socket
 
 # Dados do cliente para conexao como server
 ipServidor = 'localhost'
-portaServidor = 5003
+portaServidor = 5001
 
 
 # Cria o objeto socket e conecta ao servidor
@@ -16,10 +16,11 @@ cliente.connect((ipServidor, portaServidor))
 
 # Resposta do servidor
 data = cliente.recv(1024)
-print '\n' + data
-data = cliente.recv(1024)
+
 print data
-cliente.send('lucas')
+
+s = raw_input("Digete:")
+cliente.send(s)
 
 
-cliente.close()
+

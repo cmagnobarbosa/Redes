@@ -10,6 +10,7 @@ Licença: MIT
 Disciplina: Redes de Computadores
 Universidade Federal de São João del Rei - UFSJ
 */
+// Branch truco
 #include <strings.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +42,10 @@ int vencJogo(char mensagem [32]);
 
 int maoDe11(char *placarJogo);
 
+void truco (char mensagem[32], char *valorRodada);
+
+void mudaPlacar(char *placarJogo, char *valorRodada, char *equipe);
+
 void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char *placarRodada,
 			 char *valorRodada, char *question, char *eqQuestion,
 			 char *respQuestion, char *mesa, char *virada);
@@ -54,7 +59,7 @@ int main(){
 	struct sockaddr_in endereco_servidor, endereco_cliente;
 
 	/* Variaveis do jogo */
-	int i, j, saida = 0, volta, vencedor;
+	int i, j, saida = 0, volta, vencedor, flag = 0, aux = 0;
 	char mensagem[32], token[9], strAux[9];
 	char vez[2], rodada[2], placarJogo[5], placarRodada[4], valorRodada[3];
 	char question[2], eqQuestion[2], respQuestion[2], mesa[9], virada[2];
@@ -62,7 +67,7 @@ int main(){
 	jogador clientes[4];
 
 	/* Abrindo o socket */
-	socket_con = socket(AF_INET, SOCK_STREAM,0);
+	socket_con = socket(AF_INET, SOCK_STREAM,0); 
 	if(socket_con < 0)
 		printf("Erro ao criar o socket.\n");
 
@@ -76,15 +81,15 @@ int main(){
 	if (bind(socket_con, (struct sockaddr *) &endereco_servidor,sizeof(endereco_servidor)) < 0)
 		printf("Erro ao Abrir a porta.\n");
 	else
-		printf("Aguardando conexão dos clientes...\n");
+		printf("Aguardando conexão dos 4 clientes...\n");	
 
 	/* Tamanho maximo da fila de clientes. */
 	listen(socket_con, 5);
-
+	
 	/* Estabelece a conexão com os clientes */
 	for(i = 0; i < 4; i++){
 		clientes[i].porta = accept(socket_con,(struct sockaddr *) &endereco_cliente, &cliente_len); // Atribuindo a porta
-		bzero(strAux,9);
+		bzero(strAux,9);	
 		strAux[0] = i + 48;
 		strcpy(clientes[i].id, strAux); // Atribuindo id
 
@@ -94,22 +99,22 @@ int main(){
 			strcpy(clientes[i].equipe, "b"); // Atribuindo a equipe B
 	}
 
-	if(clientes[0].porta < 0 || clientes[1].porta < 0 ||
+	if(clientes[0].porta < 0 || clientes[1].porta < 0 || 
 	   clientes[2].porta < 0 || clientes[3].porta < 0)
 	   printf("Erro ao conectar com o cliente.\n");
 	else{
 		for(i = 0; i < 4; i++)
 			printf("Conectado ao cliente: %s porta %d\n", clientes[i].id, clientes[i].porta);
-	}
+	}		
 
 	cliente_len = sizeof(endereco_cliente);	//???
 
 
-
+	
 
 	/*  Realiza a leitura do socket do cliente
 		temp = read(clientes[0].porta, mensagem, 23);
-		printf("Mensagem: %s   e o temp vale: %d\n", mensagem,temp);
+		printf("Mensagem: %s   e o temp vale: %d\n", mensagem,temp); 
 
 		Escreve uma reposta no socket para o cliente.
 		O último parametro é o numero de bytes */
@@ -122,19 +127,22 @@ int main(){
 
 		bzero(mensagem, 32); //Zera o buffer de mensagens
 		strcpy(mensagem, "000000000000000000000000000000\n"); // Mensagem inicial
-		entregar(clientes, mensagem);
+		setToken(mensagem, 10, 13, placarJogo);
 
+		entregar(clientes, mensagem);
+		sleep(1);
+
+		flag = 0;
 		volta = saida;
-		if(maoDe11(placarJogo))
-			strcpy(valorRodada, "12");
+		if(maoDe11(placarJogo)) // Se estiver na mao de 11 a rodada vale 3
+			strcpy(valorRodada, "44");
 		else
-			strcpy(valorRodada, "12");
+			strcpy(valorRodada, "11");
 
 		for(i = 0; i < 3; i++){    // Rodada: 3 turnos
 			rodada[0] = i + 49;
 			strcpy(mesa, "00000000");
 			strcpy(placarRodada, getToken(mensagem, 14, 16, placarRodada));
-			//strcpy(placarJogo, getToken(mensagem, 10, 13, placarJogo));
 
 			for(j = 0; j < 4; j++){   // Turno: 4 jogadores->(4 jogadas)
 				printf("Vez do jogador id: %d\n", volta);
@@ -142,19 +150,102 @@ int main(){
 			 			valorRodada, "0", "0",
 			 			"0", mesa, "E");
 
-				sleep(1);
 				write(clientes[volta].porta, mensagem, 31);
 				read(clientes[volta].porta, mensagem, 31);
 				broadCast(mensagem, clientes);
 
+				// Caso tenha um pedido truco, seis, etc
+				if(strcmp(getToken(mensagem, 17, 18, strAux), "12") != 0 && mensagem[19] == '1'){ 
+					aux = volta;
+					printf("\nJogador %d pediu truco. \n", volta);
+
+					if(aux == 3){						
+						setToken(mensagem, 20, 20, clientes[0].equipe);
+						broadCast(mensagem, clientes);
+						sleep(1);
+
+						setToken(mensagem, 2, 2, "1"); 
+						printf("Vez do jogador 0.\n");
+						write(clientes[0].porta, mensagem, 31);
+						read(clientes[0].porta, mensagem, 31);
+
+						if(mensagem[21] == '1'){
+							printf("\nJogador 0 aceitou o truco! \n");
+							truco(mensagem, valorRodada);
+							setToken(mensagem, 19, 19, "0"); // zerando question
+							setToken(mensagem, 21, 21, "0"); // zerando rep_question
+							broadCast(mensagem, clientes);
+							sleep(1);
+
+							setToken(mensagem, 2, 2, "1"); 
+							printf("Vez do jogador 3\n");
+							write(clientes[3].porta, mensagem, 31);
+							read(clientes[3].porta, mensagem, 31);
+							broadCast(mensagem, clientes);
+						}
+						else{
+							setToken(mensagem, 19, 19, "0"); // zerando question
+							setToken(mensagem, 21, 21, "0"); // zerando rep_question
+							printf("\nJogador 0 correu.\n");
+							sleep(1);
+							flag = 1;
+							break;
+						}			
+					}
+					else{
+						setToken(mensagem, 20, 20, clientes[aux+1].equipe);
+						broadCast(mensagem, clientes);
+						sleep(1);
+
+						setToken(mensagem, 2, 2, "1"); 
+						printf("Vez do jogador %d\n", volta + 1);
+						write(clientes[aux+1].porta, mensagem, 31);
+						read(clientes[aux+1].porta, mensagem, 31);
+
+						if(mensagem[21] == '1'){
+							printf("\nJogador %d aceitou o truco.\n", volta + 1);
+							truco(mensagem, valorRodada);
+							setToken(mensagem, 19, 19, "0"); // zerando question
+							setToken(mensagem, 21, 21, "0"); // zerando rep_question
+							broadCast(mensagem, clientes);
+							sleep(1);
+
+							setToken(mensagem, 2, 2, "1"); 
+							printf("Vez do jogador %d\n", volta);
+							write(clientes[aux].porta, mensagem, 31);
+							read(clientes[aux].porta, mensagem, 31);
+							broadCast(mensagem, clientes);
+						}
+						else if(mensagem[21] == '0'){
+							setToken(mensagem, 19, 19, "0"); // zerando question
+							setToken(mensagem, 21, 21, "0"); // zerando rep_question
+							printf("\nJogador %d correu. \n", volta + 1);
+							sleep(1);
+							flag = 1;
+							break;
+						}
+					}
+				}
+				
 				strcpy(mesa, getToken(mensagem, 22, 29, mesa));
 
 				if(volta == 3)
 					volta = 0;
-				else
+				else{
 					volta++;
+				}
+
 			}
 
+			if(flag == 1){    // Caso a equipe tenha corrido do truco
+				flag = 0;
+				printf("\nA equipe  '%s'  venceu a rodada!\n\n", clientes[volta].equipe );
+				mudaPlacar(placarJogo, valorRodada, clientes[volta].equipe);	
+				setToken(mensagem, 10, 13, placarJogo);
+				broadCast(mensagem, clientes);
+				sleep(1);
+				break;
+			}
 			vencedor = vencTurno(mensagem, baralho);
 			setToken(mensagem, 22, 29, "00000000"); // limpando mesa
 
@@ -176,13 +267,14 @@ int main(){
 			broadCast(mensagem, clientes);
 
 			if(vencRodada(mensagem, placarJogo)){
+				setToken(mensagem, 10, 13, placarJogo);
 				broadCast(mensagem, clientes);
 				sleep(2);
-				break;
+				break;			
 			}
 
 		}
-
+		
 		if(saida == 3)
 			saida = 0 ;
 		else
@@ -199,7 +291,8 @@ int main(){
 			 			valorRodada, question, eqQuestion,
 			 			respQuestion, mesa, virada); */
 
-		//read(clientes[volta].porta, mensagem, 23);
+		//read(clientes[volta].porta, mensagem, 23);	
+
 	}
 
 	/* Fecha o socket de conexão com o cliente */
@@ -220,10 +313,10 @@ void embaralhar(carta baralho[40]){
 	strcpy(baralho[2].nome , "ae"); baralho[2].valor = 12;
 	strcpy(baralho[3].nome , "7o"); baralho[3].valor = 11;
 
-	strcpy(baralho[4].nome , "3p"); baralho[4].valor = 10;
-	strcpy(baralho[5].nome , "3c"); baralho[5].valor = 10;
-	strcpy(baralho[6].nome , "3e"); baralho[6].valor = 10;
-	strcpy(baralho[7].nome , "3o"); baralho[7].valor = 10;
+	strcpy(baralho[4].nome , "3p"); baralho[4].valor = 10; 
+	strcpy(baralho[5].nome , "3c"); baralho[5].valor = 10; 
+	strcpy(baralho[6].nome , "3e"); baralho[6].valor = 10; 
+	strcpy(baralho[7].nome , "3o"); baralho[7].valor = 10; 
 
 	strcpy(baralho[8].nome , "2p"); baralho[8].valor = 9;
 	strcpy(baralho[9].nome , "2c"); baralho[9].valor = 9;
@@ -237,7 +330,7 @@ void embaralhar(carta baralho[40]){
 	strcpy(baralho[15].nome, "kp"); baralho[15].valor = 7;
 	strcpy(baralho[16].nome, "kc"); baralho[16].valor = 7;
 	strcpy(baralho[17].nome, "ke"); baralho[17].valor = 7;
-	strcpy(baralho[18].nome, "ko"); baralho[18].valor = 7;
+	strcpy(baralho[18].nome, "ko"); baralho[18].valor = 7;  
 
 	strcpy(baralho[19].nome, "jp"); baralho[19].valor = 6;
 	strcpy(baralho[20].nome, "jc"); baralho[20].valor = 6;
@@ -274,7 +367,7 @@ void distribuir(carta baralho[40], jogador clientes[4]){
     srand(time(NULL));
 
 	for(i = 0; i < 12; i++){
-        card[i] = rand()%40;
+        card[i] = rand()%40;        
         for(j = 0; j < i; j++){
             if(card[j] == card[i]){
                 card[i] = rand()%40;
@@ -294,9 +387,9 @@ void distribuir(carta baralho[40], jogador clientes[4]){
 
 void entregar(jogador clientes[4], char mensagem[32]){
 /* Esta funçaõ realiza o envio de uma mensagem padrao para todos os clientes */
-
+	
 	int i;
-
+	
 	for(i = 0; i < 4; i++){
 		setToken(mensagem, 0, 0, clientes[i].id);
 		setToken(mensagem, 1, 1, clientes[i].equipe);
@@ -307,8 +400,8 @@ void entregar(jogador clientes[4], char mensagem[32]){
 }
 
 int getValor(char *nome, carta baralho[40]){
-/* Retorna o valor de uma carta com base no nome da mesma */
-
+/* Retorna o valor de uma carta com base no nome da mesma */ 
+	
 	int i;
 	for(i = 0; i < 40; i++){
 		if(strcmp(baralho[i].nome, nome) == 0)
@@ -333,10 +426,10 @@ char* getToken(char mensagem[32], int inicio, int fim, char *token){
 
 void setToken(char mensagem[32], int inicio, int fim, char *token){
 /* Altera um trecho especifico da mensagem delimitado por 'inicio' e 'fim' */
-
+	
 	int i, j = 0;
 	for(i = inicio; i <= fim; i++){
-		mensagem[i] = token[j];
+		mensagem[i] = token[j]; 
 		j++;
 	}
 }
@@ -347,9 +440,9 @@ int vencTurno(char mensagem[32], carta baralho[40]){
 	int i, carta[4];
 
 	carta[0] = getValor(getToken(mensagem, 22, 23, token), baralho);
-	carta[1] = getValor(getToken(mensagem, 24, 25, token), baralho);
-	carta[2] = getValor(getToken(mensagem, 26, 27, token), baralho);
-	carta[3] = getValor(getToken(mensagem, 28, 29, token), baralho);
+	carta[1] = getValor(getToken(mensagem, 24, 25, token), baralho); 
+	carta[2] = getValor(getToken(mensagem, 26, 27, token), baralho); 
+	carta[3] = getValor(getToken(mensagem, 28, 29, token), baralho); 
 
 	int idMaior = 0, maior = carta[0];
 
@@ -374,6 +467,7 @@ int vencRodada(char mensagem[32], char *placarJogo){
 	int i, cont_A = 0, cont_B = 0, cont_ = 0, cont_jogadas = 0;
 	char placarRodada[3];
 	char valorRodada[3];
+	char zero[2] ;
 	int jogo, rodada;
 
 	strcpy(placarRodada, getToken(mensagem, 14, 16, placarRodada));
@@ -394,17 +488,24 @@ int vencRodada(char mensagem[32], char *placarJogo){
 		}
 	}
 
-
-
+	
+		
 
 	if(cont_jogadas >= 2){
 		if(cont_A > cont_B){
 			getToken(mensagem, 17, 18, valorRodada);
-			getToken(mensagem, 10, 11, placarJogo);
+			getToken(mensagem, 10, 11, placarJogo);   
 			rodada = atoi(valorRodada);
 			jogo = atoi(placarJogo);
-			jogo += rodada;
-			sprintf(placarJogo, "%d", jogo);
+			jogo += rodada; 
+			sprintf(zero, "%d", jogo);
+			if(jogo < 10){
+				strcpy(placarJogo, "0");
+				strcat(placarJogo, zero);
+			}
+			else{
+				strcat(placarJogo, zero);
+			}
 
 			setToken(mensagem, 10, 11, placarJogo); // Atualizando o placar do jogo
 			printf("A equipe A venceu a rodada!\n\n");
@@ -417,8 +518,14 @@ int vencRodada(char mensagem[32], char *placarJogo){
 			rodada = atoi(valorRodada);
 			jogo = atoi(placarJogo);
 			jogo += rodada;
-			sprintf(placarJogo, "%d", jogo);
-
+			sprintf(zero, "%d", jogo);
+			if(jogo < 10){
+				strcpy(placarJogo, "0");
+				strcat(placarJogo, zero);
+			}
+			else{
+				strcat(placarJogo, zero);
+			}
 			setToken(mensagem, 12, 13, placarJogo); // Atualizando o placar do jogo
 			printf("A equipe B venceu a rodada!\n\n");
 			strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
@@ -429,12 +536,18 @@ int vencRodada(char mensagem[32], char *placarJogo){
 			for(i = 0; i < 3; i++){
 				if(placarRodada[i] == 'a'){
 					getToken(mensagem, 17, 18, valorRodada);
-					getToken(mensagem, 10, 11, placarJogo);
+					getToken(mensagem, 10, 11, placarJogo);   
 					rodada = atoi(valorRodada);
 					jogo = atoi(placarJogo);
-					jogo += rodada;
-					sprintf(placarJogo, "%d", jogo);
-
+					jogo += rodada; 
+					sprintf(zero, "%d", jogo);
+					if(jogo < 10){
+						strcpy(placarJogo, "0");
+						strcat(placarJogo, zero);
+					}
+					else{
+						strcpy(placarJogo, zero);
+					}
 					setToken(mensagem, 10, 11, placarJogo); // Atualizando o placar do jogo
 					printf("A equipe A venceu a rodada!\n\n");
 					strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
@@ -446,8 +559,14 @@ int vencRodada(char mensagem[32], char *placarJogo){
 					rodada = atoi(valorRodada);
 					jogo = atoi(placarJogo);
 					jogo += rodada;
-					sprintf(placarJogo, "%d", jogo);
-
+					sprintf(zero, "%d", jogo);
+					if(jogo < 10){
+						strcpy(placarJogo, "0");
+						strcat(placarJogo, zero);
+					}
+					else{
+						strcat(placarJogo, zero);
+					}
 					setToken(mensagem, 12, 13, placarJogo); // Atualizando o placar do jogo
 					printf("A equipe B venceu a rodada!\n\n");
 					strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
@@ -455,15 +574,15 @@ int vencRodada(char mensagem[32], char *placarJogo){
 					return 1;
 				}
 			}
-		}
+		}		
 	}
 
-	return 0;
+	return 0;	
 }
 
 int vencJogo(char mensagem [32]){
 /* Retorna 1 caso alguma equipe tenha vencido o jogo(atingido 12 pts) */
-
+	
 	char placar[5], aux[3], aux2[3];
 	int pA=0, pB=0;
 
@@ -497,6 +616,79 @@ int maoDe11(char *placarJogo){
 	return 0;
 }
 
+void truco (char mensagem[32], char *valorRodada){
+/* Aumenta o valor da rodada caso haja um pedido de truco */
+	int rodada;
+	char aux[2];
+
+	rodada = atoi(valorRodada);
+
+	if(rodada == 1){
+		rodada = 3;
+	}
+	else if(rodada == 3){
+		rodada = 6;
+	}
+	else if(rodada == 6){
+		rodada = 9;
+	}
+	else if(rodada == 9){
+		rodada = 12;
+	}
+	bzero(valorRodada, 3);
+	sprintf(aux, "%d", rodada);
+
+	if(rodada >= 10){
+		setToken(mensagem, 17, 18, aux);
+	}
+	else{
+		strcpy(valorRodada, "0");
+		strcat(valorRodada, aux);
+		setToken(mensagem, 17, 18, valorRodada);
+	}
+}
+
+void mudaPlacar(char *placarJogo, char *valorRodada, char *equipe){
+/* Muda o plcar do jogo, caso alguma equipe fuja de um pedido de truco */
+
+	int rodada, valorPlacar;
+	char placar[3];
+	char aux[2] ;
+	rodada = atoi(valorRodada);
+
+	if(strcmp(equipe, "a") == 0){
+		getToken(placarJogo, 0, 1, placar);
+		valorPlacar = atoi(placar);
+		valorPlacar += rodada;
+		sprintf(aux, "%d", valorPlacar);
+
+		if(valorPlacar <= 10){
+			strcpy(placar, "0");
+			strcat(placar, aux);
+		}
+		else{
+			strcpy(placar, aux);
+		}	 
+		setToken(placarJogo, 0, 1, placar);
+
+	}
+	else if(strcmp(equipe, "b") == 0){
+		getToken(placarJogo, 2, 3, placar);
+		valorPlacar = atoi(placar);
+		valorPlacar += rodada;
+		sprintf(aux, "%d", valorPlacar);
+		if(valorPlacar <= 10){
+			strcpy(placar, "0");
+			strcat(placar, aux);
+		}
+		else{
+			strcpy(placar, aux);
+		}
+		setToken(placarJogo, 2, 3, placar);
+	}
+
+}
+
 void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char *placarRodada,
 			 char *valorRodada, char *question, char *eqQuestion,
 			 char *respQuestion, char *mesa, char *virada){
@@ -519,7 +711,7 @@ void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char 
 void broadCast(char mensagem[32], jogador clientes[4]){
 /* Envia uma mesma mensagem para todos os clientes */
 	int i;
-
+	
 	setToken(mensagem, 2, 2, "0"); // Indica que não é a vez de ninguem
 	for(i = 0; i < 4; i++){
 		write(clientes[i].porta, mensagem, 31);
