@@ -162,7 +162,7 @@ class Principal(Gui):
             cont = cont + 1
             # self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
             # self.gui.update_card_adversario(1,self.cont_cartas)
-            if not i == "00":
+            if not (i == "00" or i=="0"):
                 i = self.gui.caminho_cartas + i + ".png"
 
                 if(self.jogador.id == "0"):
@@ -289,6 +289,7 @@ class Principal(Gui):
         """Exibe a tela de Truco"""
         if(self.question_truco == "1") and self.sua_vez is 1:
             self.gui.tela_truco()
+            self.flag_truco=1
 
     def solicita_truco(self):
         """Solicitar Truco"""
