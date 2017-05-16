@@ -32,7 +32,7 @@ class Principal(Gui):
     def __init__(self):
         #---HABILITAR BOTAO TRUCO---
         #Ative para ativar a opção de pedir truco..
-        self.truco_habilitado = 0
+        self.truco_habilitado = 1
         #--------------------
 
         self.mensagem_servidor = ""
@@ -139,6 +139,7 @@ class Principal(Gui):
             if(cartas != "000000"):
                 # Considerando que nos decorrer das partida o servidor não envia as
                 # cartas. Redefine a mão do jogador.
+                self.gui.cartas_recebidas=[]
                 self.jogador.cartas_mao = cartas
                 cartas = self.agrupa_cartas(cartas)
                 for i in cartas:
@@ -323,6 +324,7 @@ class Principal(Gui):
                 self.gui.mostra_pontuacao(self.jogador.equipe)
                 self.gui.rodadas(self.jogador.equipe)
                 self.atualiza_mensagem()
+                self.verifica_proposta_truco()
                 self.gui.desenha_botao_truco(self.gui.valor_rodada,self.proposta_truco_equipe)
                 if event.type == QUIT:
                     print "Encerrando conexão...."
@@ -408,7 +410,8 @@ class Principal(Gui):
                             #self.gui.desenha_botao_truco(self.gui.valor_rodada)
                             if (self.truco_habilitado is 1):
                                 print "entrouuu"
-                                if(self.gui.valor_rodada !="12"):
+                                if(self.sua_vez== "1" and (self.jogador.equipe==self.proposta_truco_equipe or self.proposta_truco_equipe=="0")):
+                                    print "pedindo truco"
                                     self.question_truco="1"
                                     self.solicita_truco()
                                     self.flag_truco = 1
