@@ -8,5 +8,11 @@ Requisitos:
 No Ubuntu Instale o pygame utilizando o pip:
 pip install pygame
 
+
+Para Executar:
+
+Edite o arquivo config com o IP e a porta do servidor.
+Exemplo:
+localhost 5001
 Para executar o cliente digite no terminal:
  > python cliente.py
