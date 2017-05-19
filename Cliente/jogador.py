@@ -1,5 +1,17 @@
 # coding: utf-8
+"""
+Cliente
+Tp de Redes - Truco
+UFSJ
+Carlos Magno
+Lucas Geraldo
 
+Requisitos:
+*python 2.7
+*pygame
+
+Modulo jogador.
+"""
 class Jogador:
     """Vai armazenar os dados do jogador"""
     def __init__(self):

@@ -13,7 +13,6 @@ Requisitos:
 *pygame
 
 Modulo de conexão.
-Versão Inicial
 """
 
 
@@ -21,16 +20,17 @@ class Conexao:
     """Modulo de conexão com servidor"""
 
     def __init__(self):
-        self.servidor_end = '172.16.255.15'     # Endereco IP do Servidor
-        self.porta = self.ler_config()
+        self.servidor_end = self.ler_config()[0]   # Endereco IP do Servidor
+        self.porta = int(self.ler_config()[1])
         self.socket = ""                           # Porta que o Servidor esta
         # self.socket_conexao = None                #Socket de conexao.
 
     def ler_config(self):
-        """Ler a configuração de porta do arquivo"""
+        """Ler a configuração de Ip e porta do arquivo de Config"""
         arquivo = open("config", "r")
         for i in arquivo:
-            return int(i)
+            temp = i.split(" ")
+        return temp
 
     def envia_mensagem(self, mensagem):
         """Envia mensagem para o servidor"""

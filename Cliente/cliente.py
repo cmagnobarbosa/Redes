@@ -45,7 +45,7 @@ class Principal(Gui):
         self.recebe_cartas()
         self.gui.carrega_cartas()
         #--------------------
-        self.pede_truco="0"
+        self.pede_truco = "0"
         self.rodada = 1
         self.gui.valor_rodada = "0"
         self.flag_truco = 0
@@ -98,9 +98,8 @@ class Principal(Gui):
 
         """
 
-        # self.conexao.envia_mensagem("0")
         self.mensagem_servidor = self.conexao.ler_socket()
-        # print "Me", self.mensagem_servidor
+
         #--Extrai os dados iniciais...
         self.jogador.id = self.mensagem_servidor[0:1]
         self.jogador.equipe = self.mensagem_servidor[1:2]
@@ -130,7 +129,9 @@ class Principal(Gui):
             self.finaliza_rodada(int(lista[3:4]))
             self.rodada = int(lista[3:4])
             cartas = lista[4:10]
-            if(cartas != "000000"):
+            if(cartas is not "000000"):
+                pass
+            else:
                 # Considerando que nos decorrer das partida o servidor não envia as
                 # cartas. Redefine a mão do jogador.
                 self.gui.cartas_recebidas = []
@@ -157,19 +158,15 @@ class Principal(Gui):
         print self.mensagem_servidor
         cartas = self.agrupa_cartas(self.mesa_jogo)
         print "Cartas Mesa ", cartas
-        cont = -1
+        cont = 0
         for i in cartas:
-            cont = cont + 1
-            # self.gui.renderiza_cartas_jogadas(i,self.gui.pos_cartas_jog_1)
-            # self.gui.update_card_adversario(1,self.cont_cartas)
-            if not (i == "00" or i=="0"):
+            if not (i == "00" or i == "0"):
                 i = self.gui.caminho_cartas + i + ".png"
 
                 if(self.jogador.id == "0"):
                     if cont is 0:
                         self.gui.renderiza_cartas_jogadas(
                             i, self.gui.sua_pos_carta)
-
                     if cont is 1:
                         self.gui.renderiza_cartas_jogadas(
                             i, self.gui.pos_cartas_jog_1)
@@ -250,6 +247,7 @@ class Principal(Gui):
                     elif cont is 3:
                         self.gui.renderiza_cartas_jogadas(
                             i, self.gui.sua_pos_carta)
+                cont = cont + 1
 
     def finaliza_rodada(self, valor):
         """Verifica se a rodada terminou e limpa a tela"""
@@ -289,7 +287,7 @@ class Principal(Gui):
         """Exibe a tela de Truco"""
         if(self.question_truco == "1") and self.sua_vez is 1:
             self.gui.tela_truco()
-            self.flag_truco=1
+            self.flag_truco = 1
 
     def solicita_truco(self):
         """Solicitar Truco"""
@@ -300,7 +298,7 @@ class Principal(Gui):
                 :19] + self.pede_truco + self.mensagem_servidor[20:]
             print "Mensagem enviada na solicitação de Truco..", self.mensagem_servidor
             self.conexao.envia_mensagem(self.mensagem_servidor)
-            self.pede_truco ="0"
+            self.pede_truco = "0"
 
     def responde_truco(self):
         """Envia uma mensagem para o servidor com a resposta do truco"""
@@ -382,24 +380,15 @@ class Principal(Gui):
                     if op == "273":
                         print "carta jogada", self.gui.mao[self.carta_selecionada]
                         if (self.carta_selecionada != -1):
-                            # self.gui.jogar_carta(
-                            # self.gui.mao[self.carta_selecionada],
-                            # self.conexao)
+
                             self.sua_vez = 1  # Bloqueia a mão ..
                             self.envia_carta_servidor(
                                 self.gui.mao[self.carta_selecionada])
-                            # Update a carta do adversario para teste
-                            # Atualiza as cartas em miniatura
-                            #---------------------------------------
-
-                            #self.gui.update_card_adversario(1, 1)
-                            #self.gui.update_card_adversario(2, 1)
-                            #self.gui.update_card_adversario(3, 1)
 
                             if self.carta_selecionada is not 3:
                                 self.gui.mao[self.carta_selecionada] = None
                             self.gui.verifica_mao(self.gui.mao, self.conexao)
-                            # self.gui.pause()
+
                 if event.type == MOUSEBUTTONDOWN and select == 0:
                     """Define a mudança da tela"""
                     print event.button, event.pos
@@ -407,10 +396,6 @@ class Principal(Gui):
                         self.gui.caminho_background + "fundo.jpg")
                     self.gui.novo_tamanho_janela()
                     self.gui.tela.blit(fundo, [0, 0])
-                    # self.gui.rodadas()
-                    # self.gui.mostra_pontuacao()
-                    # self.gui.desenha_botao_truco(self.gui.valor_rodada)
-
                     self.gui.update_card_adversario(0, 3)
                     self.gui.escrever(
                         "Para selecionar cartas escolha [1,2,3]", (30, 30),

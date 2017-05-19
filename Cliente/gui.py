@@ -43,12 +43,12 @@ class Gui():
         self.lista_cards = []
         self.cartas_recebidas = []
         self.mao = []
-        self.cont_cartas= 3
+        self.cont_cartas = 3
         #-----------------------
         self.valor_rodada = "0"
         self.pontos = "0000"
-        self.partidas="000"
-        self.mensagem_vez="Aguarde..."
+        self.partidas = "000"
+        self.mensagem_vez = "Aguarde..."
         #---------------------
 
         self.tela = pygame.display.set_mode((500, 400), 0, 32)
@@ -58,58 +58,57 @@ class Gui():
     def atualiza_pontuacao(self, ponto):
         self.valor_rodada = ponto
 
-    def desenha_botao_truco(self,v_rodada,equipe):
+    def desenha_botao_truco(self, v_rodada, equipe):
         """Desenha o Botão de truco"""
-        texto="Truco"
+        texto = "Truco"
         if equipe == "0":
             if(v_rodada == "1"):
                 texto = "Truco"
         elif equipe == "a":
             if(v_rodada == "3"):
-                texto="Seis"
+                texto = "Seis"
             elif(v_rodada == "6"):
-                texto="Nove"
-            elif(v_rodada =="9"):
-                texto="Doze"
-            elif(v_rodada=="12"):
-                texto=" "
+                texto = "Nove"
+            elif(v_rodada == "9"):
+                texto = "Doze"
+            elif(v_rodada == "12"):
+                texto = " "
         elif equipe == "b":
             if(v_rodada == "3"):
-                texto="Seis"
+                texto = "Seis"
             elif(v_rodada == "6"):
-                texto="Nove"
-            elif(v_rodada =="9"):
-                texto="Doze"
-            elif(v_rodada=="12"):
-                texto=" "
+                texto = "Nove"
+            elif(v_rodada == "9"):
+                texto = "Doze"
+            elif(v_rodada == "12"):
+                texto = " "
 
         pygame.draw.rect(self.tela, (192, 192, 192), (670, 471, 110, 20))
-        self.escrever(texto, (670, 471),self.branco)
+        self.escrever(texto, (670, 471), self.branco)
 
-    def mostra_pontuacao(self,equipe):
+    def mostra_pontuacao(self, equipe):
         """ Renderiza a Pontuação."""
-        #Quadrado do valor da rodada
+        # Quadrado do valor da rodada
         pygame.draw.rect(self.tela, (0, 0, 0), (670, 450, 110, 20))
 
         pygame.draw.rect(self.tela, (0, 0, 0), (29, 450, 145, 20))
 
-        pygame.draw.rect(self.tela,(0, 0, 0),(29,430,145,20))
-        self.escrever(self.mensagem_vez,(40,430),(255,0,0))
+        pygame.draw.rect(self.tela, (0, 0, 0), (29, 430, 145, 20))
+        self.escrever(self.mensagem_vez, (40, 430), (255, 0, 0))
         self.escrever("Sua Equipe: " + equipe, (670, 450), self.branco)
-        if(equipe=="a"):
+        if(equipe == "a"):
             self.escrever("Nós: " + self.pontos[0:2] + " Eles: " +
                           self.pontos[2:4], (40, 450), self.branco)
         else:
             self.escrever("Nós: " + self.pontos[2:4] + " Eles: " +
                           self.pontos[0:2], (40, 450), self.branco)
 
-
-    def rodadas(self,equipe):
+    def rodadas(self, equipe):
         """"Desenha um bloco"""
 
         card = pygame.draw.rect(self.tela, (0, 0, 0), (29, 471, 145, 30))
         self.escrever("[" + self.partidas[0:1] + "] | [" + self.partidas[1:2] +
-                      "] | [" + self.partidas[2:3] + "]", (40, 471),self.branco)
+                      "] | [" + self.partidas[2:3] + "]", (40, 471), self.branco)
         pygame.display.update()
 
     def carrega_cartas(self):
@@ -124,7 +123,6 @@ class Gui():
         """(posicao_horizontal,posicao_vertical,d_altura,d_largura)"""
         if card is not None:
             card = pygame.image.load(card)
-            #(X,Y,Largura,Altura)
             self.tela.blit(card, posicao)
 
     def update_card_adversario(self, jogador, carta):
@@ -161,8 +159,6 @@ class Gui():
                 cont = cont + 1
         if cont >= 3:
             print("Fim de rodada")
-            #conexao.envia_mensagem("Fim")
-            #conexao.encerra_conexao()
 
     def renderiza_cartas_jogadas(self, carta_jogada, posicao):
         """Renderiza a carta jogada"""
@@ -190,7 +186,7 @@ class Gui():
         "Largura x Altura"
         self.tela = pygame.display.set_mode((800, 500), 0, 32)
 
-    def escrever(self, texto, posicao , cor ):
+    def escrever(self, texto, posicao, cor):
         """Formato posicao (horizontal,vertical)"""
         texto_c = unicode(texto, "utf-8")
         myfont = pygame.font.SysFont("arial", 18)
@@ -198,35 +194,25 @@ class Gui():
         #(X,y)
         self.tela.blit(label, posicao)
 
-    def tela_padrao(self,equipe):
+    def tela_padrao(self, equipe):
         fundo = pygame.image.load("background/fundo.jpg")
         self.tela.blit(fundo, [0, 0])
         self.rodadas(equipe)
         self.mostra_pontuacao(equipe)
-        #self.desenha_botao_truco("Truco")
-        self.update_card_adversario(0,self.cont_cartas)
+        # self.desenha_botao_truco("Truco")
+        self.update_card_adversario(0, self.cont_cartas)
         self.escrever(
-            "Para selecionar cartas escolha [1,2,3]", (30, 30),self.branco)
+            "Para selecionar cartas escolha [1,2,3]", (30, 30), self.branco)
         self.escrever(
-            "Para Jogar a carta utilize seta para frente", (30, 50),self.branco)
+            "Para Jogar a carta utilize seta para frente", (30, 50), self.branco)
         self.escrever(
-            "Utilize as setas direcionais para ocultar", (30, 70),self.branco)
-        # self.tela.blit(truco,(200,170,450,100))
+            "Utilize as setas direcionais para ocultar", (30, 70), self.branco)
 
     def tela_truco(self):
         """Renderiza a tela de Truco e retorna a resposta"""
         truco = pygame.image.load("truco.png")
         tamanho = pygame.Surface.get_rect(truco)
         self.tela.blit(truco, (200, 170, 450, 100))
-        # truco.fill((0,0,0,0))
-        # truco.set_alpha(255)
-
-        # print type(truco)
-
-        # 0,0,0,0 clear..
-        # pygame.gfxdraw.box(self.tela, pygame.Rect(427,204,65,60), (192,192,192,192))
-        # self.escrever("TRUCO",(427,204))
-        # self.escrever("",(427,204))
 
     def pause(self):
         print "Jogo pausado Aguarde..."
