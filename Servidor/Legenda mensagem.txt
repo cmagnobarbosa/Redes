@@ -13,13 +13,13 @@ Posição		Legenda				Valores
 
 [3:4]			rodada 				1,2,3 			1 byte
 
-[4:10]		mão 				4p7cke 			6 bytes
+[4:10]			mão 				4p7cke 			6 bytes
 
-[10:14]		placar_jogo 		0000 			4 bytes
+[10:14]			placar_jogo 		0000 			4 bytes
+	
+[14:17]			Placar_rodada 		aba 			3 bytes
 
-[14:17]		Placar_rodada 		aba 			3 bytes
-
-[17:19]		Valor_rodada 		01,03,06,09,12  2 bytes
+[17:19]			Valor_rodada 		01,03,06,09,12  2 bytes
 
 [19:20]			Question 			0,1 			1 byte 		*
 
@@ -27,7 +27,7 @@ Posição		Legenda				Valores
 
 [21:22]			Resp_question 		0,1 			1 byte 		*
 
-[22:30]		mesa 				4p7cae7o 		8 bytes 	*
+[22:30]			mesa 				4p7cae7o 		8 bytes 	*
 
 [30:31]			virada 				0,1 			1 byte 		*
 
