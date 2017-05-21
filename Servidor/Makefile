@@ -1,7 +1,5 @@
-# Make Inicial do servidor
-necessario: servidor.c
-	gcc servidor.c -o saida
-	./saida
+compilar: servidor.c truco.c
+	gcc servidor.c truco.c -o servidorExe
 
 limpar:
-	rm -rf saida	
+	rm -rf servidorExe
