@@ -118,12 +118,20 @@ class Principal(Gui):
             palavra = conexao.ler_socket()
             if(palavra is not None):
                 self.quee.put(palavra)
-
+    def verifica_erro_mensagem(self,lista):
+        """Verifica e corrige erro na mensagem recebida"""
+        tamanho=len(lista)
+        if(tamanho<30):
+            lista = lista[
+                :0] + "00" + lista[1:]
+        print "Mensagem corrigida ",lista
+        return lista
     def processa_resposta(self, lista):
         """Vai processar a mensagem recebida"""
         self.mensagem_servidor = lista
         if(lista is not None):
             print "resposta vinda do servidor ", lista
+            #lista = self.verifica_erro_mensagem(lista)
             self.sua_vez = int(lista[2:3])
             self.atualiza_mensagem()
             self.finaliza_rodada(int(lista[3:4]))
@@ -257,18 +265,6 @@ class Principal(Gui):
 
     def prepara_mensagem(self, carta_jogada):
         """Prepara uma mensagem da carta jogada para o envio"""
-        print "Mensagem ", self.mensagem_servidor
-        # acerta o id
-        self.mensagem_servidor = self.mensagem_servidor[
-            :0] + "0" + self.mensagem_servidor[1:]
-
-        # Acerta a equipe
-        self.mensagem_servidor = self.mensagem_servidor[
-            :1] + "0" + self.mensagem_servidor[2:]
-        # Limpa mao..
-        self.mensagem_servidor = self.mensagem_servidor[
-            :4] + "000000" + self.mensagem_servidor[10:]
-
         # Acerta a posicao da carta na mesa
         if(int(self.jogador.id) is 0):
             self.mensagem_servidor = self.mensagem_servidor[
@@ -450,6 +446,7 @@ class Principal(Gui):
                 # Percorre a fila lendo as mensagens recebidas do servidor
                 if not self.quee.empty():
                     retorno = self.quee.get(i)
+                    self.verifica_erro_mensagem(retorno)
                     self.processa_resposta(retorno)
                     # Adiciona um evento na pilha de eventos para atualizar a
                     # tela.
