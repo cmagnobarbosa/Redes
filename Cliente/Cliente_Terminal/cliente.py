@@ -21,7 +21,7 @@ def main():
     try:
         # Estabelecendo conexão com o servidor
         cliente.connect((ipServidor, portaServidor))
-        print "Cliete conectado ao servidor!"
+        print "Cliente conectado ao servidor!"
 
     except Exception:
         print "Erro ao conectar ao servidor!"

@@ -8,7 +8,6 @@ Requisitos:
 No Ubuntu Instale o pygame utilizando o pip:
 pip install pygame
 
-
 Para Executar:
 
 Edite o arquivo config com o IP e a porta do servidor.

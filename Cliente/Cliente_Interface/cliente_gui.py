@@ -124,7 +124,7 @@ class Principal(Gui):
         if(tamanho<30):
             lista = lista[
                 :0] + "00" + lista[1:]
-        print "Mensagem corrigida ",lista
+            print "Mensagem corrigida ",lista
         return lista
     def processa_resposta(self, lista):
         """Vai processar a mensagem recebida"""
