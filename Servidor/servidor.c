@@ -152,8 +152,8 @@ int main(){
 			 			valorRodada, "0", eqQuestion,
 			 			"0", mesa, "E");
 
-				printf("Valor da rodada %s\n", valorRodada );
-				printf("Mensagem normal %s\n",  mensagem);
+				// printf("Valor da rodada %s\n", valorRodada );
+				// printf("Mensagem normal %s\n",  mensagem);
 
 				write(clientes[volta].porta, mensagem, 31);
 				read(clientes[volta].porta, mensagem, 31);
@@ -253,7 +253,7 @@ int main(){
 				sleep(1);
 				break;
 			}
-			vencedor = vencTurno(mensagem, baralho);
+			vencedor = vencTurno(mensagem, baralho); // Retorna jogador que venceu o turno
 			setToken(mensagem, 22, 29, "00000000"); // limpando mesa
 
 			if(vencedor >= 10){
@@ -273,7 +273,8 @@ int main(){
 			}
 			broadCast(mensagem, clientes);
 
-			if(vencRodada(mensagem, placarJogo)){
+			if(vencRodada(mensagem, placarJogo)){ // Se alguma equipe houver vencido a rodada
+				mudaPlacar(placarJogo, valorRodada, clientes[volta].equipe);	
 				setToken(mensagem, 10, 13, placarJogo);
 				broadCast(mensagem, clientes);
 				sleep(2);
@@ -501,84 +502,90 @@ int vencRodada(char mensagem[32], char *placarJogo){
 
 	if(cont_jogadas >= 2){
 		if(cont_A > cont_B){
-			getToken(mensagem, 17, 18, valorRodada);
-			getToken(mensagem, 10, 11, placarJogo);   
-			rodada = atoi(valorRodada);
-			jogo = atoi(placarJogo);
-			jogo += rodada; 
-			sprintf(zero, "%d", jogo);
-			if(jogo < 10){
-				strcpy(placarJogo, "0");
-				strcat(placarJogo, zero);
-			}
-			else{
-				strcat(placarJogo, zero);
-			}
+			// getToken(mensagem, 17, 18, valorRodada);
+			// getToken(mensagem, 10, 11, placarJogo);   
+			// rodada = atoi(valorRodada);
+			// jogo = atoi(placarJogo);
+			// jogo += rodada; 
+			// sprintf(zero, "%d", jogo);
+			// if(jogo < 10){
+			// 	strcpy(placarJogo, "0");
+			// 	strcat(placarJogo, zero);
+			// }
+			// else{
+			// 	strcat(placarJogo, zero);
+			// }
 
-			setToken(mensagem, 10, 11, placarJogo); // Atualizando o placar do jogo
+			// setToken(mensagem, 10, 11, placarJogo); // Atualizando o placar do jogo
 			printf("A equipe A venceu a rodada!\n\n");
-			strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
+			// bzero(placarJogo, 4);
+			// strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
+			// strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
 			return 1;
 		}
 		else if(cont_B > cont_A){
-			getToken(mensagem, 17, 18, valorRodada);
-			getToken(mensagem, 12, 13, placarJogo);
-			rodada = atoi(valorRodada);
-			jogo = atoi(placarJogo);
-			jogo += rodada;
-			sprintf(zero, "%d", jogo);
-			if(jogo < 10){
-				strcpy(placarJogo, "0");
-				strcat(placarJogo, zero);
-			}
-			else{
-				strcat(placarJogo, zero);
-			}
-			setToken(mensagem, 12, 13, placarJogo); // Atualizando o placar do jogo
+			// getToken(mensagem, 17, 18, valorRodada);
+			// getToken(mensagem, 12, 13, placarJogo);
+			// rodada = atoi(valorRodada);
+			// jogo = atoi(placarJogo);
+			// jogo += rodada;
+			// sprintf(zero, "%d", jogo);
+			// if(jogo < 10){
+			// 	strcpy(placarJogo, "0");
+			// 	strcat(placarJogo, zero);
+			// }
+			// else{
+			// 	strcat(placarJogo, zero);
+			// }
+			// setToken(mensagem, 12, 13, placarJogo); // Atualizando o placar do jogo
 			printf("A equipe B venceu a rodada!\n\n");
-			strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
-			strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
+			// bzero(placarJogo, 4);
+			// strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
+			// strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
 			return 1;
 		}
 		else if( (cont_A == cont_B) && (cont_ >= 1)){
 			for(i = 0; i < 3; i++){
 				if(placarRodada[i] == 'a'){
-					getToken(mensagem, 17, 18, valorRodada);
-					getToken(mensagem, 10, 11, placarJogo);   
-					rodada = atoi(valorRodada);
-					jogo = atoi(placarJogo);
-					jogo += rodada; 
-					sprintf(zero, "%d", jogo);
-					if(jogo < 10){
-						strcpy(placarJogo, "0");
-						strcat(placarJogo, zero);
-					}
-					else{
-						strcpy(placarJogo, zero);
-					}
-					setToken(mensagem, 10, 11, placarJogo); // Atualizando o placar do jogo
+					// getToken(mensagem, 17, 18, valorRodada);
+					// getToken(mensagem, 10, 11, placarJogo);   
+					// rodada = atoi(valorRodada);
+					// jogo = atoi(placarJogo);
+					// jogo += rodada; 
+					// sprintf(zero, "%d", jogo);
+					// if(jogo < 10){
+					// 	strcpy(placarJogo, "0");
+					// 	strcat(placarJogo, zero);
+					// }
+					// else{
+					// 	strcpy(placarJogo, zero);
+					// }
+					// setToken(mensagem, 10, 11, placarJogo); // Atualizando o placar do jogo
 					printf("A equipe A venceu a rodada!\n\n");
-					strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
+					// bzero(placarJogo, 4);
+					// strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
+					// strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
 					return 1;
 				}
 				else if(placarRodada[i] == 'b'){
-					getToken(mensagem, 17, 18, valorRodada);
-					getToken(mensagem, 12, 13, placarJogo);
-					rodada = atoi(valorRodada);
-					jogo = atoi(placarJogo);
-					jogo += rodada;
-					sprintf(zero, "%d", jogo);
-					if(jogo < 10){
-						strcpy(placarJogo, "0");
-						strcat(placarJogo, zero);
-					}
-					else{
-						strcat(placarJogo, zero);
-					}
-					setToken(mensagem, 12, 13, placarJogo); // Atualizando o placar do jogo
+					// getToken(mensagem, 17, 18, valorRodada);
+					// getToken(mensagem, 12, 13, placarJogo);
+					// rodada = atoi(valorRodada);
+					// jogo = atoi(placarJogo);
+					// jogo += rodada;
+					// sprintf(zero, "%d", jogo);
+					// if(jogo < 10){
+					// 	strcpy(placarJogo, "0");
+					// 	strcat(placarJogo, zero);
+					// }
+					// else{
+					// 	strcat(placarJogo, zero);
+					// }
+					// setToken(mensagem, 12, 13, placarJogo); // Atualizando o placar do jogo
 					printf("A equipe B venceu a rodada!\n\n");
-					strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
-					strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
+					// bzero(placarJogo, 4);
+					// strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
+					// strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
 					return 1;
 				}
 			}
@@ -601,7 +608,7 @@ int vencJogo(char mensagem [32]){
 	pA = atoi(aux);
 	pB = atoi(aux2);
 
-	printf("Placar -------- %s\n", placar);
+	printf("Placar do jogo -------- %s\n", placar);
 
 	if(pA > 11){
 		printf("\nA equipe A venceu o jogo!\n");

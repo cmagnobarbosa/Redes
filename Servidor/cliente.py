@@ -1,13 +1,63 @@
 # coding: utf-8
 import socket
 
+baralho = {
+	"ap": " A paus"
+	"ac": " A copas"
+	"ae": " A espada"
+	"ao": " A ouro"
+	"2p": " 2 paus"
+	"2c": " 2 copas"
+	"2e": " 2 espada"
+	"2p": " 2 ouro"
+	"3p": " 3 paus"
+	"3c": " 3 copas"
+	"3e": " 3 espada"
+	"3o": " 3 ouro"
+	"4p": " 4 paus"
+	"4c": " 4 copas"
+	"4e": " 4 espada"
+	"4o": " 4 ouro"
+	"5p": " 5 paus"
+	"5c": " 5 copas"
+	"5e": " 5 espada"
+	"5o": " 5 ouro"
+	"6p": ""
+	"6c": ""
+	"6e": ""
+	"6o": ""
+	"7p": ""
+	"7c": ""
+	"7e": ""
+	"7o": ""
+	"qp": ""
+	"qc": ""
+	"qe": ""
+	"qo": ""
+	"jp": ""
+	"jc": ""
+	"je": ""
+	"jo": ""
+	"kp": ""
+	"kc": ""
+	"ke": ""
+	"ko": ""
+}
 
-def traduzCarta():
-	pass
 
-def traduzPlacar():
-	pass
+def traduzCarta(cartas):
+	aux = ''
 
+	if(len(cartas) == 6): # Cartas da mão do jogador
+		for i in range(0,3):
+			aux += baralho[cartas[i:i+2]]
+			i += 1
+	if(len(cartas) == 8): # Cartas da mesa
+		for i in range(0,4):
+			aux += baralho[cartas[i:i+2]]
+			i += 1
+
+	return aux
 def pedirTruco(mensagem):
 	mensagem_aux = ''
 
@@ -30,7 +80,6 @@ def respTruco(mensagem, op):
 	mensagem_aux += mensagem[22:]
 
 	return mensagem_aux
-	
 
 def jogarCarta(mensagem, cliente_mao, op, cliente_Id):
 	"""
@@ -96,7 +145,7 @@ def acao(mensagem, cliente_Id, cliente_Eq, cliente_mao):
 	# Caso haja a possibilidade de pedir truco	
 	elif(valor < 12 and 
 		(mensagem[20:21] == "0" or mensagem[20:21] == cliente_Eq) and
-		 (placarA is not "12" and placarB is not "12")):		
+        (placarA is not "11" and placarB is not "11")):		
 
 		# Caso o usuario digite uma opção invalida
 		while(op not in l): 
@@ -139,18 +188,17 @@ def acao(mensagem, cliente_Id, cliente_Eq, cliente_mao):
 		mensagem = pedirTruco(mensagem)
 		return mensagem
 
-
-
 def info(mensagem):
 	"""
 	Informa ao cliente a situação do jogo, sempre que algum outro jogador
 	realiza alguma ação
 	"""
 
-	print "******************* Info **********************"
+	print "******************************* Info *****************************"
 
 	print ("Mesa\nid 0: %s | id 1: %s | id 2: %s | id 3: %s" 
-		   % (mensagem[22:24], mensagem[24:26], mensagem[26:28], mensagem[28:30]))
+		   % (baralho[mensagem[22:24]], baralho[mensagem[24:26]],
+		   	  baralho[mensagem[26:28]], baralho[mensagem[28:30]]))
 	
 	print ("\nPlacar da Rodada:[%s] [%s] [%s]"
 		   % (mensagem[14:15], mensagem[15:16], mensagem[16:17]))
@@ -160,7 +208,7 @@ def info(mensagem):
 	print ("\nPlacar do jogo\nA: %s \t B: %s"
 		   % (mensagem[10:12], mensagem[12:14]))
 
-	print "***********************************************\n"
+	print "******************************************************************\n"
 
 def takeCards(cartas):
 	"""
@@ -239,10 +287,10 @@ def main():
 
 
 	if(int(mensagem[10:12]) >= 12):
-		print "\n\n\tFim de jogo! Equipe A venceu o jogo!"
+		print "\n\tFim de jogo! Equipe A venceu o jogo!\n"
 
 	if(int(mensagem[12:14]) >= 12):	
-		print "\n\n\tFim de jogo! Equipe B venceu o jogo!"
+		print "\n\tFim de jogo! Equipe B venceu o jogo!\n"
 
 
 		cliente.close()
