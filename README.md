@@ -28,11 +28,15 @@ Execute um cliente com interface e os demais sem interface.
 
 # Cliente Terminal:
 
+Acesse a pasta do cliente terminal.
+
 > python cliente.py
 
 # Cliente Interface:
 
 Configure o ip e a porta do servidor no arquivo config
+
+Acesse a pasta do cliente com interface.
 
 * Requisito
 
