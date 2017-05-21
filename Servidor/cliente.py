@@ -8,6 +8,30 @@ def traduzCarta():
 def traduzPlacar():
 	pass
 
+def pedirTruco(mensagem):
+	mensagem_aux = ''
+
+	mensagem_aux += mensagem[:19]
+	mensagem_aux += "1"
+	mensagem_aux += mensagem[20:]
+
+	print "\n\tAguardando resposta do oponente..."
+
+	return mensagem_aux
+
+def respTruco(mensagem, op):
+	mensagem_aux = ''
+
+	mensagem_aux += mensagem[:21]
+	if(op == "1"):
+		mensagem_aux += "1" # Aceitar truco
+	elif(op == "2"):
+		mensagem_aux += "0"	# Correr do truco
+	mensagem_aux += mensagem[22:]
+
+	return mensagem_aux
+	
+
 def jogarCarta(mensagem, cliente_mao, op, cliente_Id):
 	"""
 	Realiza alteração na mensagem, inserindo no campo 'mesa' a carta jogada pelo cliente
@@ -15,7 +39,6 @@ def jogarCarta(mensagem, cliente_mao, op, cliente_Id):
 	mensagem_aux = ''
 
 	if(cliente_Id == '0'):
-		print "Entrou no id 0"
 		mensagem_aux += mensagem[:22]
 		mensagem_aux += cliente_mao[op]
 		mensagem_aux += mensagem[24:]
@@ -44,46 +67,54 @@ def jogarCarta(mensagem, cliente_mao, op, cliente_Id):
 def acao(mensagem, cliente_Id, cliente_Eq, cliente_mao):
 	print "\nSua vez:"
 	opcoes = []
-	cont = 1
+	cont = 0
+	op = ''
+	l = ['1', '2']
+	valor = int(mensagem[17:19])
+	placarA = mensagem[10:12]
+	placarB = mensagem[12:14]
 
-	# Caso haja a possibilidade de pedir truco
-	if(int(mensagem[17:19]) < 12 and (mensagem[20:21] == "0" or mensagem[20:21] == cliente_Eq)):
-		l = ['1', '2']
-		print "1 - Jogar Carta"
+	# Caso o adversario tenha pedido truco
+	if(mensagem[19:20] == "1"):
 		if(mensagem[17:19] == "01"):
-			print "2 - Pedir truco"
+			print "\n\t Seu adversario pediu truco..."
 		else:
-			print "2 - Pedir %d" % (int(mensagem[20:21]) + 3)
-		op = raw_input("Opção: ")
+			print "\n\t Seu adversario pediu", valor + 3
+		
+		print "Escolha:"
+		while(op not in l):
+			print "1 - Aceitar"
+			print "2 - Correr"
+			op = raw_input("Opçao: ")
+			if(op not in l):
+				print "\nOpção inválida!\nEscolha:"
 
-		while(op not in l): # Caso o usuario digite uma opção invalida
-			print "\nOpção inválida!\nAção:"
+		mensagem = respTruco(mensagem, op)
+		return mensagem
+
+
+	# Caso haja a possibilidade de pedir truco	
+	elif(valor < 12 and 
+		(mensagem[20:21] == "0" or mensagem[20:21] == cliente_Eq) and
+		 (placarA is not "12" and placarB is not "12")):		
+
+		# Caso o usuario digite uma opção invalida
+		while(op not in l): 
 			print "1 - Jogar Carta"
-			if(mensagem[20:21] == "01"):
+			if(mensagem[17:19] == "01"):
 				print "2 - Pedir truco"
 			else:
-				print "2 - Pedir %d" % (int(mensagem[20:21]) + 3)
+				print "2 - Pedir %d" % (int(mensagem[17:19]) + 3)
 			op = raw_input("Opçao: ")
+			if(op not in l):
+				print "\nOpção inválida!\nSua vez:"
 	else:
 		op = "1"
 
 	# Jogar carta	
-	if(op is "1"): 
-		print "\nEscolha uma carta para jogar:"
-		opcoes = []
-		cont = 0
-		for i in cliente_mao:
-			print cont, "-", i
-			opcoes.append(cont)
-			cont += 1
-			
-
-		op = raw_input("Opção: ")
-		op = int(op)
-
+	if(op is "1"):
 		while(op not in opcoes):
-			print "\nOpção invalida!"
-			print "Escolha uma carta para jogar:"
+			print "\nEscolha uma carta para jogar:"
 			opcoes = []
 			cont = 0
 			for i in cliente_mao:
@@ -92,10 +123,23 @@ def acao(mensagem, cliente_Id, cliente_Eq, cliente_mao):
 				cont += 1
 				
 			op = raw_input("Opçao: ")
-			op = int(op)
+			try:
+				op = int(op)
+				if(op not in opcoes):
+					print "\nOpção invalida! Digite uma das opções disponiveis"
+			except Exception:
+				print "\nOpção invalida! Digite uma das opções disponiveis"		
+			
 		
 		mensagem = jogarCarta(mensagem, cliente_mao, op, cliente_Id)
 		return mensagem
+
+	# Pedir truco
+	elif(op is "2"):
+		mensagem = pedirTruco(mensagem)
+		return mensagem
+
+
 
 def info(mensagem):
 	"""
@@ -111,7 +155,9 @@ def info(mensagem):
 	print ("\nPlacar da Rodada:[%s] [%s] [%s]"
 		   % (mensagem[14:15], mensagem[15:16], mensagem[16:17]))
 
-	print ("\nPlacar do jogo\nNos: %s \t Eles: %s"
+	print ("\nValor da Rodada: " + mensagem[17:19])
+
+	print ("\nPlacar do jogo\nA: %s \t B: %s"
 		   % (mensagem[10:12], mensagem[12:14]))
 
 	print "***********************************************\n"
@@ -183,11 +229,12 @@ def main():
 
 		else:
 			if(mensagem[2:3] is "1"): # Vez do cliente
+				print "\n\txxxxxxx " + mensagem
 				mensagem = acao(mensagem, cliente_Id, cliente_Eq, cliente_mao)
 				print "mensagem para envio " , mensagem
 				cliente.send(mensagem)
 				
-			else:
+			elif(mensagem[2:3] is "0" and mensagem[19:20] is not "1"):
 				info(mensagem) 	
 
 

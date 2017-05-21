@@ -59,7 +59,7 @@ int main(){
 	struct sockaddr_in endereco_servidor, endereco_cliente;
 
 	/* Variaveis do jogo */
-	int i, j, saida = 0, volta, vencedor, flag = 0, aux = 0;
+	int i, j, saida = 0, volta, vencedor, flag = 0, aux = 0 ;
 	char mensagem[32], token[9], strAux[9];
 	char vez[2], rodada[2], placarJogo[5], placarRodada[4], valorRodada[3];
 	char question[2], eqQuestion[2], respQuestion[2], mesa[9], virada[2];
@@ -139,6 +139,8 @@ int main(){
 		else
 			strcpy(valorRodada, "01");
 
+		strcpy(eqQuestion,"0");
+
 		for(i = 0; i < 3; i++){    // Rodada: 3 turnos
 			rodada[0] = i + 49;
 			strcpy(mesa, "00000000");
@@ -147,8 +149,11 @@ int main(){
 			for(j = 0; j < 4; j++){   // Turno: 4 jogadores->(4 jogadas)
 				printf("Vez do jogador id: %d\n", volta);
 				unirMsg(mensagem, "1", rodada, placarJogo, placarRodada,
-			 			valorRodada, "0", "0",
+			 			valorRodada, "0", eqQuestion,
 			 			"0", mesa, "E");
+
+				printf("Valor da rodada %s\n", valorRodada );
+				printf("Mensagem normal %s\n",  mensagem);
 
 				write(clientes[volta].porta, mensagem, 31);
 				read(clientes[volta].porta, mensagem, 31);
@@ -161,6 +166,7 @@ int main(){
 
 					if(aux == 3){						
 						setToken(mensagem, 20, 20, clientes[0].equipe);
+						strcpy(eqQuestion, clientes[0].equipe);
 						broadCast(mensagem, clientes);
 						sleep(1);
 
@@ -194,6 +200,7 @@ int main(){
 					}
 					else{
 						setToken(mensagem, 20, 20, clientes[aux+1].equipe);
+						strcpy(eqQuestion, clientes[aux+1].equipe);
 						broadCast(mensagem, clientes);
 						sleep(1);
 
@@ -281,6 +288,7 @@ int main(){
 			saida++;
 
 		if(vencJogo(mensagem)){
+			broadCast(mensagem, clientes);
 			break;
 		}
 
@@ -593,6 +601,8 @@ int vencJogo(char mensagem [32]){
 	pA = atoi(aux);
 	pB = atoi(aux2);
 
+	printf("Placar -------- %s\n", placar);
+
 	if(pA > 11){
 		printf("\nA equipe A venceu o jogo!\n");
 		return 1;
@@ -639,6 +649,7 @@ void truco (char mensagem[32], char *valorRodada){
 	sprintf(aux, "%d", rodada);
 
 	if(rodada >= 10){
+		strcat(valorRodada, aux);
 		setToken(mensagem, 17, 18, aux);
 	}
 	else{
@@ -662,7 +673,7 @@ void mudaPlacar(char *placarJogo, char *valorRodada, char *equipe){
 		valorPlacar += rodada;
 		sprintf(aux, "%d", valorPlacar);
 
-		if(valorPlacar <= 10){
+		if(valorPlacar < 10){
 			strcpy(placar, "0");
 			strcat(placar, aux);
 		}
@@ -677,7 +688,7 @@ void mudaPlacar(char *placarJogo, char *valorRodada, char *equipe){
 		valorPlacar = atoi(placar);
 		valorPlacar += rodada;
 		sprintf(aux, "%d", valorPlacar);
-		if(valorPlacar <= 10){
+		if(valorPlacar < 10){
 			strcpy(placar, "0");
 			strcat(placar, aux);
 		}
