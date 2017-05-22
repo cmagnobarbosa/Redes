@@ -11,13 +11,13 @@ Sendo elas:
  
 Caso não tenha o gerenciador "pip" instalado, o mesmo pode ser obtido digitando-se o comando:
 
-       sudo apt-get install pip
+      sudo apt-get install pip
 
 ## Executando
 Execução do servidor:
 Para executar o servidor, acesse a pasta "./servidor" e execute o arquivo "servidorExe":
 
-        ./servidorExe
+      ./servidorExe
 
 Execução do cliente:
 O servidor irá iniciar o jogo apenas após 4 clientes estarem conectados a ele.
@@ -33,11 +33,11 @@ Caso deseje executar os 4 clientes em um mesmo computador, recomendamos que exec
 
 - Para executar um cliente sem interface gráfica acesse a pasta Cliente_Terminal:
 
-       cd Cliente/Cliente_Terminal
+      cd Cliente/Cliente_Terminal
   
   e digite o comando:
   
-       python cliente.py
+      python cliente.py
 
 Observação: Para o cliente com interface configure o ip e a porta do servidor 
 no arquivo "config" presente na pasta "./Cliente/Cliente_Iterface" .
