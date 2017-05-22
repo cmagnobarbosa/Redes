@@ -3,7 +3,7 @@
 Tamanho da Mensagem: 32 bytes
 [0:32]
 
-Posição		Legenda				Valores
+Posição			Legenda				Valores
 
 [0:1]			id_jogador			0,1,2,3			1 byte
 
@@ -40,3 +40,5 @@ Posição		Legenda				Valores
 # Modelo de mensagem broadCast após o 1º jogador jogar a 1ª carta:
 
 0001007c7o0000000010004p0000000
+
+# Os campos marcados com * são os campos que o cliente pode alterar

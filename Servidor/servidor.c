@@ -29,7 +29,7 @@ int main(){
 	int i, j, saida = 0, volta, vencedor, flag = 0, aux = 0 ;
 	char mensagem[32], token[9], strAux[9];
 	char vez[2], rodada[2], placarJogo[5], placarRodada[4], valorRodada[3];
-	char question[2], eqQuestion[2], respQuestion[2], mesa[9], virada[2];
+	char question[2], eqQuestion[2], respQuestion[2], mesa[9];
 	carta baralho[40];
 	jogador clientes[4];
 
@@ -74,17 +74,7 @@ int main(){
 			printf("Conectado ao cliente: %s porta %d\n", clientes[i].id, clientes[i].porta);
 	}		
 
-	cliente_len = sizeof(endereco_cliente);	//???
-
-
-	
-
-	/*  Realiza a leitura do socket do cliente
-		temp = read(clientes[0].porta, mensagem, 23);
-		printf("Mensagem: %s   e o temp vale: %d\n", mensagem,temp); 
-
-		Escreve uma reposta no socket para o cliente.
-		O último parametro é o numero de bytes */
+	cliente_len = sizeof(endereco_cliente);
 
 	/* Loop para troca de mensagens com os clientes */
 	strcpy(placarJogo, "0000");
@@ -118,10 +108,6 @@ int main(){
 				unirMsg(mensagem, "1", rodada, placarJogo, placarRodada,
 			 			valorRodada, "0", eqQuestion,
 			 			"0", mesa, "E");
-
-				// printf("Valor da rodada %s\n", valorRodada );
-				// printf("Mensagem normal %s\n",  mensagem);
-
 				write(clientes[volta].porta, mensagem, 31);
 				read(clientes[volta].porta, mensagem, 31);
 				broadCast(mensagem, clientes);

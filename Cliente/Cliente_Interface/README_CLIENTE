@@ -3,15 +3,21 @@ O presente cliente integra o projeto do jogo de truco.
 Problemas no Cliente:
 Em testes realizados não foi possível executar mais de dois clientes simultaneamente
 sem implicar em um alto custo de processamento.
+
 Requisitos:
 *pygame
+
 No Ubuntu Instale o pygame utilizando o pip:
-pip install pygame
+	
+	pip install pygame
+
 
 Para Executar:
-
 Edite o arquivo config com o IP e a porta do servidor.
+
 Exemplo:
 localhost 5001
+
 Para executar o cliente digite no terminal:
- > python cliente.py
+ 	
+	python cliente.py

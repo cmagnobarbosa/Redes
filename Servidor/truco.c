@@ -12,6 +12,7 @@
 void embaralhar(carta baralho[40]){
 /* Esta função atribui os nomes e valores de cada carta
    do baralho de truco a uma poisição do array baralho */
+
 	// As cartas estão ordenadas por ordem decrescente de valor
 	strcpy(baralho[0].nome , "4p"); baralho[0].valor = 14;
 	strcpy(baralho[1].nome , "7c"); baralho[1].valor = 13;
@@ -80,7 +81,6 @@ void distribuir(carta baralho[40], jogador clientes[4]){
             }
         }
     }
-
     for(i = 0; i < 4; i++){
     	bzero(clientes[i].mao, 7);
     	for(j = 0; j < 3; j++){
@@ -141,6 +141,7 @@ void setToken(char mensagem[32], int inicio, int fim, char *token){
 
 int vencTurno(char mensagem[32], carta baralho[40]){
 /* Retorna o id do jogador vencedor do turno */
+	
 	char token[3];
 	int i, carta[4];
 
@@ -172,8 +173,6 @@ int vencRodada(char mensagem[32], char *placarJogo){
 	int i, cont_A = 0, cont_B = 0, cont_ = 0, cont_jogadas = 0;
 	char placarRodada[3];
 	char valorRodada[3];
-	//char zero[2] ;
-	//int jogo, rodada;
 
 	strcpy(placarRodada, getToken(mensagem, 14, 16, placarRodada));
 	printf("O placar da rodada esta: %s\n\n",placarRodada );
@@ -198,64 +197,11 @@ int vencRodada(char mensagem[32], char *placarJogo){
 	char aux[2] ;
 
 	getToken(mensagem, 17, 18, valorRodada);
-	rodada = atoi(valorRodada);
-
-	// if(strcmp(equipe, "a") == 0){
-	// 	getToken(placarJogo, 0, 1, placar);
-	// 	valorPlacar = atoi(placar);
-	// 	valorPlacar += rodada;
-	// 	sprintf(aux, "%d", valorPlacar);
-
-	// 	if(valorPlacar < 10){
-	// 		strcpy(placar, "0");
-	// 		strcat(placar, aux);
-	// 	}
-	// 	else{
-	// 		strcpy(placar, aux);
-	// 	}	 
-	// 	setToken(placarJogo, 0, 1, placar);
-
-	// }
-	// else if(strcmp(equipe, "b") == 0){
-	// 	getToken(placarJogo, 2, 3, placar);
-	// 	valorPlacar = atoi(placar);
-	// 	valorPlacar += rodada;
-	// 	sprintf(aux, "%d", valorPlacar);
-	// 	if(valorPlacar < 10){
-	// 		strcpy(placar, "0");
-	// 		strcat(placar, aux);
-	// 	}
-	// 	else{
-	// 		strcpy(placar, aux);
-	// 	}
-	// 	setToken(placarJogo, 2, 3, placar);
-	// }
-
-	
-		
+	rodada = atoi(valorRodada);		
 
 	if(cont_jogadas >= 2){
+
 		if(cont_A > cont_B){
-			// getToken(mensagem, 17, 18, valorRodada);
-			// getToken(mensagem, 10, 11, placarJogo);   
-			// rodada = atoi(valorRodada);
-			// jogo = atoi(placarJogo);
-			// jogo += rodada; 
-			// sprintf(zero, "%d", jogo);
-			// if(jogo < 10){
-			// 	strcpy(placarJogo, "0");
-			// 	strcat(placarJogo, zero);
-			// }
-			// else{
-			// 	strcat(placarJogo, zero);
-			// }
-
-			// setToken(mensagem, 10, 11, placarJogo); // Atualizando o placar do jogo
-			// bzero(placarJogo, 4);
-			// strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
-			// strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
-			
-
 			getToken(placarJogo, 0, 1, placar);
 			valorPlacar = atoi(placar);
 			valorPlacar += rodada;
@@ -273,27 +219,8 @@ int vencRodada(char mensagem[32], char *placarJogo){
 			printf("A equipe A venceu a rodada!\n\n");
 			return 1;
 		}
+
 		else if(cont_B > cont_A){
-			// getToken(mensagem, 17, 18, valorRodada);
-			// getToken(mensagem, 12, 13, placarJogo);
-			// rodada = atoi(valorRodada);
-			// jogo = atoi(placarJogo);
-			// jogo += rodada;
-			// sprintf(zero, "%d", jogo);
-			// if(jogo < 10){
-			// 	strcpy(placarJogo, "0");
-			// 	strcat(placarJogo, zero);
-			// }
-			// else{
-			// 	strcat(placarJogo, zero);
-			// }
-			// setToken(mensagem, 12, 13, placarJogo); // Atualizando o placar do jogo
-			// bzero(placarJogo, 4);
-			// strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
-			// strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
-
-
-
 			getToken(placarJogo, 2, 3, placar);
 			valorPlacar = atoi(placar);
 			valorPlacar += rodada;
@@ -311,30 +238,11 @@ int vencRodada(char mensagem[32], char *placarJogo){
 			printf("A equipe B venceu a rodada!\n\n");
 			return 1;
 		}
+
 		else if( (cont_A == cont_B) && (cont_ >= 1)){
 			for(i = 0; i < 3; i++){
+
 				if(placarRodada[i] == 'a'){
-					// getToken(mensagem, 17, 18, valorRodada);
-					// getToken(mensagem, 10, 11, placarJogo);   
-					// rodada = atoi(valorRodada);
-					// jogo = atoi(placarJogo);
-					// jogo += rodada; 
-					// sprintf(zero, "%d", jogo);
-					// if(jogo < 10){
-					// 	strcpy(placarJogo, "0");
-					// 	strcat(placarJogo, zero);
-					// }
-					// else{
-					// 	strcpy(placarJogo, zero);
-					// }
-					// setToken(mensagem, 10, 11, placarJogo); // Atualizando o placar do jogo
-					// bzero(placarJogo, 4);
-					// strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
-					// strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
-
-
-
-
 					getToken(placarJogo, 0, 1, placar);
 					valorPlacar = atoi(placar);
 					valorPlacar += rodada;
@@ -352,27 +260,8 @@ int vencRodada(char mensagem[32], char *placarJogo){
 					printf("A equipe A venceu a rodada!\n\n");
 					return 1;
 				}
+
 				else if(placarRodada[i] == 'b'){
-					// getToken(mensagem, 17, 18, valorRodada);
-					// getToken(mensagem, 12, 13, placarJogo);
-					// rodada = atoi(valorRodada);
-					// jogo = atoi(placarJogo);
-					// jogo += rodada;
-					// sprintf(zero, "%d", jogo);
-					// if(jogo < 10){
-					// 	strcpy(placarJogo, "0");
-					// 	strcat(placarJogo, zero);
-					// }
-					// else{
-					// 	strcat(placarJogo, zero);
-					// }
-					// setToken(mensagem, 12, 13, placarJogo); // Atualizando o placar do jogo
-					// bzero(placarJogo, 4);
-					// strcpy(placarJogo, getToken(mensagem, 10, 11, placarRodada));
-					// strcat(placarJogo, getToken(mensagem, 12, 13, placarRodada));
-
-
-
 					getToken(placarJogo, 2, 3, placar);
 					valorPlacar = atoi(placar);
 					valorPlacar += rodada;
@@ -394,7 +283,6 @@ int vencRodada(char mensagem[32], char *placarJogo){
 			}
 		}		
 	}
-
 	return 0;	
 }
 
@@ -426,6 +314,8 @@ int vencJogo(char mensagem [32]){
 }
 
 int maoDe11(char *placarJogo){
+/* Retorna 1 caso o jogo tenha chegado na mão de 11 */
+	
 	char a[3], b[3];
 
 	getToken(placarJogo, 0, 1, a);
@@ -438,6 +328,7 @@ int maoDe11(char *placarJogo){
 
 void truco (char mensagem[32], char *valorRodada){
 /* Aumenta o valor da rodada caso haja um pedido de truco */
+	
 	int rodada;
 	char aux[2];
 
@@ -514,6 +405,7 @@ void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char 
 			 char *valorRodada, char *question, char *eqQuestion,
 			 char *respQuestion, char *mesa, char *virada){
 /* Esta função reune todas strings em uma unica mensagem */
+	
 	bzero(mensagem, 32);
  	strcpy(mensagem, "00");
 	strcat(mensagem, vez);
@@ -531,6 +423,7 @@ void unirMsg(char mensagem[32], char *vez, char *rodada, char *placarJogo, char 
 
 void broadCast(char mensagem[32], jogador clientes[4]){
 /* Envia uma mesma mensagem para todos os clientes */
+	
 	int i;
 	
 	setToken(mensagem, 2, 2, "0"); // Indica que não é a vez de ninguem
