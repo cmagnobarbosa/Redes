@@ -7,7 +7,7 @@ Para o bom funcionamento deste projeto, recomendamos que o mesmo seja executado 
 Sendo elas: 
 - biblioteca "pygame" : Pode ser instalada por meio do gerenciador de pacotes "pip", através do comando:
 
-       sudo pip install pygame
+      sudo pip install pygame
  
 Caso não tenha o gerenciador "pip" instalado, o mesmo pode ser obtido digitando-se o comando:
 
